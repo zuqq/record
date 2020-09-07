@@ -1,12 +1,10 @@
 package record;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Arrays;
 
-public class Blob {
+public class Blob implements Record {
     private final byte[] data;
 
     public Blob(byte[] data) {
@@ -34,6 +32,7 @@ public class Blob {
         return new Blob(data);
     }
 
+    @Override
     public byte[] getBytes() {
         byte[] header = String
             .format("blob %d\0", data.length)
@@ -42,15 +41,5 @@ public class Blob {
         System.arraycopy(header, 0, result, 0, header.length);
         System.arraycopy(data, 0, result, header.length, data.length);
         return result;
-    }
-
-    public byte[] getHash() {
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-1 is broken!");
-        }
-        return md.digest(getBytes());
     }
 }
