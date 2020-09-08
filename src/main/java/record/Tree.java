@@ -12,11 +12,6 @@ public class Tree implements Record {
         this.children = children;
     }
 
-    public static Tree parse(byte[] input) {
-        // TODO
-        throw new RuntimeException("Not implemented!");
-    }
-
     public byte[] getBytes() {
         byte[][] entries = new byte[children.length][];
         int length = 0;
