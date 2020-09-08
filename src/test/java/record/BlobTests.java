@@ -24,8 +24,7 @@ public class BlobTests {
     @Test
     void getBytes() {
         Assertions.assertArrayEquals(
-            "blob 16\0what is up, doc?".getBytes(StandardCharsets.UTF_8),
-            blob.getBytes()
+            "blob 16\0what is up, doc?".getBytes(StandardCharsets.UTF_8), blob.getBytes()
         );
     }
     

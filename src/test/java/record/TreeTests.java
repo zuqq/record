@@ -8,13 +8,8 @@ import org.junit.jupiter.api.Test;
 public class TreeTests {
     private final Tree tree = new Tree(
         new Node[] {
-            new File(
-                false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8))
-            ),
-            new File(
-                false, "b", new Blob("test\n".getBytes(StandardCharsets.UTF_8))
-            )
-
+            new File(false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8))),
+            new File(false, "b", new Blob("test\n".getBytes(StandardCharsets.UTF_8)))
         }
     );
 

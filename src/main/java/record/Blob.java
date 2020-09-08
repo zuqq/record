@@ -18,9 +18,7 @@ public final class Blob implements Record {
                 break;
             }
         }
-        String header = new String(
-            Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8
-        );
+        String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
         if (!header.startsWith("blob ")) {
             throw new ParseException("Malformed header.", 0);
         }
