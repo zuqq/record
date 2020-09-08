@@ -1,6 +1,7 @@
 package record;
 
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,15 @@ public class BlobTests {
     private final Blob blob = new Blob(
         "what is up, doc?".getBytes(StandardCharsets.UTF_8)
     );
+
+    @Test
+    void parse() {
+        try {
+            Assertions.assertEquals(Blob.parse(blob.getBytes()), blob);
+        } catch (ParseException e) {
+            Assertions.fail("Parser failed on valid input.", e);
+        }
+    }
 
     @Test
     void getBytes() {
