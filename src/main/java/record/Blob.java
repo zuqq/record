@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Arrays;
 
-public class Blob implements Record {
+public final class Blob implements Record {
     private final byte[] data;
 
     public Blob(byte[] data) {
@@ -41,5 +41,22 @@ public class Blob implements Record {
         System.arraycopy(header, 0, result, 0, header.length);
         System.arraycopy(data, 0, result, header.length, data.length);
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Blob)) {
+            return false;
+        }
+        Blob other = (Blob) o;
+        return Arrays.equals(other.data, data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(data);
     }
 }
