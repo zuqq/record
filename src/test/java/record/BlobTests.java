@@ -24,19 +24,15 @@ public class BlobTests {
     @Test
     void getBytes() {
         Assertions.assertArrayEquals(
-            blob.getBytes(),
-            "blob 16\0what is up, doc?".getBytes(StandardCharsets.UTF_8)
+            "blob 16\0what is up, doc?".getBytes(StandardCharsets.UTF_8),
+            blob.getBytes()
         );
     }
     
     @Test
     void getHash() {
-        StringBuilder builder = new StringBuilder();
-        for (byte b : blob.getHash()) {
-            builder.append(String.format("%02x", b));
-        }
         Assertions.assertEquals(
-            builder.toString(), "bd9dbf5aae1a3862dd1526723246b20206e5fc37"
+            "bd9dbf5aae1a3862dd1526723246b20206e5fc37", Base16.encode(blob.getHash())
         );
     }
 }

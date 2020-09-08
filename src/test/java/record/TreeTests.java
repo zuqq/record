@@ -21,7 +21,6 @@ public class TreeTests {
     @Test
     void getBytes() {
         Assertions.assertArrayEquals(
-            tree.getBytes(),
             new byte[] {
                  116,  114,  101,  101,   32,   53,   56,    0,
                   49,   48,   48,   54,   52,   52,   32,   97,
@@ -32,7 +31,8 @@ public class TreeTests {
                  -81,  -71, -122,   76,  -12,   48,   85,  -82,
                 -109,  -66,  -80,  -81,  -42,  -57,  -47,   68,
                  -65,  -92
-            }
+            },
+            tree.getBytes()
         );
     }
 }
