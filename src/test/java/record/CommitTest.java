@@ -9,55 +9,47 @@ import org.junit.jupiter.api.Test;
 
 public class CommitTest {
     private static Commit initialCommit = null;
+    private static Commit secondCommit = null;
 
     @BeforeAll
     public static void setUp() {
+        File a = new File(false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8)));
+        File b = new File(false, "b", new Blob("b\n".getBytes(StandardCharsets.UTF_8)));
+        File c = new File(false, "c", new Blob("more stuff\n".getBytes(StandardCharsets.UTF_8)));
         User user = new User("Jane Doe", "jane@example.com");
-        Timestamp time = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
+        Timestamp initialTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
         initialCommit = new Commit(
-            new Tree(
-                new Node[] {
-                    new File(false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8))),
-                    new File(false, "b", new Blob("b\n".getBytes(StandardCharsets.UTF_8)))
-                }
-            ),
-            new Commit[0],
+            new Tree(new Node[] {a, b}),
+            new Commit[] {},
             user,
-            time,
+            initialTimestamp,
             user,
-            time,
+            initialTimestamp,
             "Initial commit"
+        );
+        Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
+        secondCommit = new Commit(
+            new Tree(new Node[] {a, b, c}),
+            new Commit[] {initialCommit},
+            user,
+            secondTimestamp,
+            user,
+            secondTimestamp,
+            "Add more stuff"
         );
     }
 
     @Test
-    void initialCommitGetBytes() {
-        Assertions.assertArrayEquals(
-            new byte[] {
-                99,  111,  109,  109,  105,  116,   32,   49,
-                54,   57,    0,  116,  114,  101,  101,   32,
-                51,   54,   56,   51,  102,   56,   55,   48,
-                98,  101,   52,   52,   54,   99,   55,   99,
-                99,   48,   53,  102,  102,   97,  101,  102,
-                57,  102,   97,   48,   54,   52,   49,   53,
-                50,   55,   54,  101,   49,   56,   50,   56,
-                10,   97,  117,  116,  104,  111,  114,   32,
-                74,   97,  110,  101,   32,   68,  111,  101,
-                32,   60,  106,   97,  110,  101,   64,  101,
-               120,   97,  109,  112,  108,  101,   46,   99,
-               111,  109,   62,   32,   49,   53,   57,   57,
-                53,   54,   56,   55,   56,   57,   32,   43,
-                48,   50,   48,   48,   10,   99,  111,  109,
-               109,  105,  116,  116,  101,  114,   32,   74,
-                97,  110,  101,   32,   68,  111,  101,   32,
-                60,  106,   97,  110,  101,   64,  101,  120,
-                97,  109,  112,  108,  101,   46,   99,  111,
-               109,   62,   32,   49,   53,   57,   57,   53,
-                54,   56,   55,   56,   57,   32,   43,   48,
-                50,   48,   48,   10,   10,   73,  110,  105,
-               116,  105,   97,  108,   32,   99,  111,  109,
-               109,  105,  116,   10             
-            },
-            initialCommit.getBytes());
+    void initialCommitGetHash() {
+        Assertions.assertEquals(
+            "42a22126b2d4fef6dd6537ecad0e63be1bc4c210", Base16.encode(initialCommit.getHash())
+        );
+    }
+
+    @Test
+    void secondCommitGetHash() {
+        Assertions.assertEquals(
+            "79d5cd29da3d56d9abda7e83d2b2bd52d43db939", Base16.encode(secondCommit.getHash())
+        );
     }
 }
