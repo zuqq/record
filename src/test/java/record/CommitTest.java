@@ -13,7 +13,7 @@ public class CommitTest {
     @BeforeAll
     public static void setUp() {
         User user = new User("Jane Doe", "jane@example.com");
-        ZonedDateTime time = ZonedDateTime.parse("2020-09-08T14:39:49+02:00");
+        Timestamp time = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
         initialCommit = new Commit(
             new Tree(
                 new Node[] {

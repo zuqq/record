@@ -1,33 +1,23 @@
 package record;
 
 import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 
 public class Commit implements Record {
-    private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-        .appendValue(ChronoField.INSTANT_SECONDS)
-        .appendLiteral(' ')
-        .appendOffset("+HHMM", "+0000")
-        .toFormatter();
-
     private final Tree tree;
     private final Commit[] parents;
     private final User author;
-    private final ZonedDateTime authorDate;
+    private final Timestamp authorDate;
     private final User committer;
-    private final ZonedDateTime committerDate;
+    private final Timestamp committerDate;
     private final String message;
 
     public Commit(
         Tree tree,
         Commit[] parents,
         User author,
-        ZonedDateTime authorDate,
+        Timestamp authorDate,
         User committer,
-        ZonedDateTime committerDate,
+        Timestamp committerDate,
         String message
     ) {
         this.tree = tree;
@@ -47,8 +37,8 @@ public class Commit implements Record {
             builder.append(String.format("parent %s\n", parent.getHash()));
         }
         builder
-            .append(String.format("author %s %s\n", author, authorDate.format(formatter)))
-            .append(String.format("committer %s %s\n", committer, committerDate.format(formatter)))
+            .append(String.format("author %s %s\n", author, authorDate))
+            .append(String.format("committer %s %s\n", committer, committerDate))
             .append('\n')
             .append(message).append('\n');
         byte[] data = builder.toString().getBytes(StandardCharsets.UTF_8);
