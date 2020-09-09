@@ -40,15 +40,15 @@ public class Commit implements Record {
     }
     
     public byte[] getBytes() {
-        StringBuilder builder = new StringBuilder();
-        builder
-            .append(String.format("tree %s\n", Base16.encode(tree.getHash())));
-        for (Commit c : parents) {
-            builder.append(String.format("parent %s\n", c.getHash()));
+        StringBuilder builder = new StringBuilder(
+            String.format("tree %s\n", Base16.encode(tree.getHash()))
+        );
+        for (Commit parent : parents) {
+            builder.append(String.format("parent %s\n", parent.getHash()));
         }
         builder
-            .append(String.format("author %s %s\n", author.toString(), authorDate.format(formatter)))
-            .append(String.format("committer %s %s\n", committer.toString(), committerDate.format(formatter)))
+            .append(String.format("author %s %s\n", author, authorDate.format(formatter)))
+            .append(String.format("committer %s %s\n", committer, committerDate.format(formatter)))
             .append('\n')
             .append(message).append('\n');
         byte[] data = builder.toString().getBytes(StandardCharsets.UTF_8);
