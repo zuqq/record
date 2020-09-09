@@ -30,11 +30,12 @@ public class Commit implements Record {
     }
     
     public byte[] getBytes() {
+        // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
         StringBuilder builder = new StringBuilder(
             String.format("tree %s\n", Base16.encode(tree.getHash()))
         );
         for (Commit parent : parents) {
-            builder.append(String.format("parent %s\n", parent.getHash()));
+            builder.append(String.format("parent %s\n", Base16.encode(parent.getHash())));
         }
         builder
             .append(String.format("author %s %s\n", author, authorDate))
