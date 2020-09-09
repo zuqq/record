@@ -1,8 +1,8 @@
 package record;
 
-public class Directory implements Node {
-    private String name;
-    private Tree tree;
+public final class Directory implements Node {
+    private final String name;
+    private final Tree tree;
 
     public Directory(String name, Tree tree) {
         this.name = name;

@@ -2,7 +2,7 @@ package record;
 
 import java.text.ParseException;
 
-public class Base16 {
+public final class Base16 {
     private static String digits = "0123456789abcdef";
 
     public static String encode(byte[] data) {

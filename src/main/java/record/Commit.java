@@ -2,7 +2,7 @@ package record;
 
 import java.nio.charset.StandardCharsets;
 
-public class Commit implements Record {
+public final class Commit implements Record {
     private final Tree tree;
     private final Commit[] parents;
     private final User author;
@@ -29,6 +29,7 @@ public class Commit implements Record {
         this.message = message;
     }
     
+    @Override
     public byte[] getBytes() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
         StringBuilder builder = new StringBuilder(

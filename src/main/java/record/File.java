@@ -1,6 +1,6 @@
 package record;
 
-public class File implements Node {
+public final class File implements Node {
     private final boolean executable;
     private final String name;
     private final Blob blob;

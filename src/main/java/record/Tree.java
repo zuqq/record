@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class Tree implements Record {
+public final class Tree implements Record {
     private final Node[] children;
 
     public Tree(Node[] children) {
@@ -12,6 +12,7 @@ public class Tree implements Record {
         this.children = children;
     }
 
+    @Override
     public byte[] getBytes() {
         byte[][] entries = new byte[children.length][];
         int length = 0;
