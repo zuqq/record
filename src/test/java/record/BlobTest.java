@@ -6,7 +6,7 @@ import java.text.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class BlobTests {
+public class BlobTest {
     private final Blob blob = new Blob("a\n".getBytes(StandardCharsets.UTF_8));
 
     @Test

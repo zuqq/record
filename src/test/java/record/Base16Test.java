@@ -5,7 +5,7 @@ import java.text.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class Base16Tests {
+public class Base16Test {
     private byte[] bytes = {
         (byte) 0x78, (byte) 0x98, (byte) 0x19, (byte) 0x22, (byte) 0x61,
         (byte) 0x3b, (byte) 0x2a, (byte) 0xfb, (byte) 0x60, (byte) 0x25,

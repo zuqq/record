@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class TreeTests {
+public class TreeTest {
     private final Tree tree = new Tree(
         new Node[] {
             new File(false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8))),
