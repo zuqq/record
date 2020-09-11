@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public final class Tree implements Record {
+public final class Tree implements LooseObject {
     private final Node[] children;
 
     public Tree(Node[] children) {

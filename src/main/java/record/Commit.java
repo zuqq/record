@@ -2,7 +2,7 @@ package record;
 
 import java.nio.charset.StandardCharsets;
 
-public final class Commit implements Record {
+public final class Commit implements LooseObject {
     private final Tree tree;
     private final Commit[] parents;
     private final User author;

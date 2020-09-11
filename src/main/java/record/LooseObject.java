@@ -3,7 +3,7 @@ package record;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public interface Record {
+public interface LooseObject {
     public abstract byte[] getBytes();
 
     public default byte[] getHash() {
