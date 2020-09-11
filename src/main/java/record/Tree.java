@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public final class Tree implements LooseObject {
-    private final Node[] children;
+    private final TreeNode[] children;
 
-    public Tree(Node[] children) {
-        Arrays.sort(children, Comparator.comparing(Node::getName));
+    public Tree(TreeNode[] children) {
+        Arrays.sort(children, Comparator.comparing(TreeNode::getName));
         this.children = children;
     }
 

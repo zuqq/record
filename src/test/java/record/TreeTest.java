@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 public class TreeTest {
     private final Tree tree = new Tree(
-        new Node[] {
+        new TreeNode[] {
             new File(false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8))),
             new File(false, "b", new Blob("b\n".getBytes(StandardCharsets.UTF_8)))
         }

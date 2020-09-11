@@ -1,6 +1,6 @@
 package record;
 
-public final class Directory implements Node {
+public final class Directory implements TreeNode {
     private final String name;
     private final Tree tree;
 

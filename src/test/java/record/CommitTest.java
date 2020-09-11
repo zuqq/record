@@ -19,7 +19,7 @@ public class CommitTest {
         User user = new User("Jane Doe", "jane@example.com");
         Timestamp initialTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
         initialCommit = new Commit(
-            new Tree(new Node[] {a, b}),
+            new Tree(new TreeNode[] {a, b}),
             new Commit[] {},
             user,
             initialTimestamp,
@@ -29,7 +29,7 @@ public class CommitTest {
         );
         Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
         secondCommit = new Commit(
-            new Tree(new Node[] {a, b, c}),
+            new Tree(new TreeNode[] {a, b, c}),
             new Commit[] {initialCommit},
             user,
             secondTimestamp,

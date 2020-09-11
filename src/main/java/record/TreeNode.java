@@ -2,7 +2,7 @@ package record;
 
 import java.nio.charset.StandardCharsets;
 
-public interface Node {
+public interface TreeNode {
     public abstract String getMode();
 
     public abstract String getName();
