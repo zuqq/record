@@ -26,4 +26,13 @@ public class SymbolicLink implements TreeNode {
     public byte[] getHash() {
         return blob.getHash();
     }
+
+    @Override
+    public void accept(TreeVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    public byte[] getBytes() {
+        return blob.getBody();
+    }
 }

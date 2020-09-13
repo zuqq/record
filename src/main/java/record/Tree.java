@@ -1,12 +1,15 @@
 package record;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -73,6 +76,61 @@ public final class Tree implements LooseObject {
         }
     }
 
+    private static class TreeWriter implements TreeVisitor {
+        private Path folder;
+
+        public TreeWriter(Path folder) {
+            this.folder = folder;
+        }
+
+        @Override
+        public void visitEnter(Directory node) {
+            folder = folder.resolve(node.getName());
+            try {
+                Files.createDirectory(folder);
+            } catch (FileAlreadyExistsException e) {
+                // No problem!
+            } catch (IOException e) {
+                // TODO: Propagate the exception instead.
+                throw new RuntimeException(
+                    MessageFormat.format("Unable to create directory {0}", folder)
+                );
+            }
+        }
+
+        @Override
+        public void visitLeave(Directory node) {
+            folder = folder.getParent();
+        }
+
+        @Override
+        public void visit(File node) {
+            Path path = folder.resolve(node.getName());
+            try {
+                Files.write(path, node.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(
+                    MessageFormat.format("Unable to create file {0}", path)
+                );
+            }
+        }
+
+        @Override
+        public void visit(SymbolicLink node) {
+            Path path = folder.resolve(node.getName());
+            try {
+                Files.createSymbolicLink(
+                    path,
+                    Path.of(new String(node.getBytes(), StandardCharsets.UTF_8))
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(
+                    MessageFormat.format("Unable to create symbolic link {0}", path)
+                );
+            }
+        }
+    }
+
     private final TreeNode[] children;
 
     public Tree(TreeNode[] children) {
@@ -80,10 +138,21 @@ public final class Tree implements LooseObject {
         this.children = children;
     }
 
+    public TreeNode[] getChildren() {
+        return children;
+    }
+
     public static Tree of(Path folder) throws IOException {
         TreeBuilder visitor = new TreeBuilder(folder);
         Files.walkFileTree(folder, visitor);
         return visitor.getResult();
+    }
+
+    public void write(Path folder) {
+        TreeWriter visitor = new TreeWriter(folder);
+        for (TreeNode child : children) {
+            child.accept(visitor);
+        }
     }
 
     @Override

@@ -19,4 +19,6 @@ public interface TreeNode {
         System.arraycopy(hash, 0, result, part.length, hash.length);
         return result;
     }
+
+    public abstract void accept(TreeVisitor visitor);
 }

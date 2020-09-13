@@ -23,4 +23,13 @@ public final class Directory implements TreeNode {
     public byte[] getHash() {
         return tree.getHash();
     }
+
+    @Override
+    public void accept(TreeVisitor visitor) {
+        visitor.visitEnter(this);
+        for (TreeNode child : tree.getChildren()) {
+            child.accept(visitor);
+        }
+        visitor.visitLeave(this);
+    }
 }
