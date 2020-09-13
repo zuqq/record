@@ -2,7 +2,7 @@ package record;
 
 import java.nio.charset.StandardCharsets;
 
-public class Branch implements LooseObject {
+public class Branch {
     private Commit tip;
 
     public Branch(Commit tip) {
@@ -17,7 +17,6 @@ public class Branch implements LooseObject {
         this.tip = tip;
     }
 
-    @Override
     public byte[] getBytes() {
         return Base16.encode(tip.getBytes()).getBytes(StandardCharsets.UTF_8);
     }
