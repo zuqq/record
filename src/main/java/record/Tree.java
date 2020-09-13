@@ -1,7 +1,6 @@
 package record;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -88,19 +87,20 @@ public final class Tree implements LooseObject {
     }
 
     @Override
-    public byte[] getBytes() {
+    public String getTag() {
+        return "tree";
+    }
+
+    @Override
+    public byte[] getBody() {
         byte[][] entries = new byte[children.length][];
         int length = 0;
         for (int i = 0; i < children.length; ++i) {
             entries[i] = children[i].toEntry();
             length += entries[i].length;
         }
-        byte[] header = String
-            .format("tree %d\0", length)
-            .getBytes(StandardCharsets.UTF_8);
-        byte[] result = new byte[header.length + length];
-        System.arraycopy(header, 0, result, 0, header.length);
-        int offset = header.length;
+        byte[] result = new byte[length];
+        int offset = 0;
         for (int i = 0; i < entries.length; ++i) {
             System.arraycopy(entries[i], 0, result, offset, entries[i].length);
             offset += entries[i].length;

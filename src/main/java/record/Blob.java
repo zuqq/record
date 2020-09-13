@@ -30,14 +30,13 @@ public final class Blob implements LooseObject {
     }
 
     @Override
-    public byte[] getBytes() {
-        byte[] header = String
-            .format("blob %d\0", data.length)
-            .getBytes(StandardCharsets.UTF_8);
-        byte[] result = new byte[header.length + data.length];
-        System.arraycopy(header, 0, result, 0, header.length);
-        System.arraycopy(data, 0, result, header.length, data.length);
-        return result;
+    public String getTag() {
+        return "blob";
+    }
+
+    @Override
+    public byte[] getBody() {
+        return data;
     }
 
     @Override

@@ -28,9 +28,14 @@ public final class Commit implements LooseObject {
         this.committerDate = committerDate;
         this.message = message;
     }
+
+    @Override
+    public String getTag() {
+        return "commit";
+    }
     
     @Override
-    public byte[] getBytes() {
+    public byte[] getBody() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
         StringBuilder builder = new StringBuilder(
             String.format("tree %s\n", Base16.encode(tree.getHash()))
@@ -43,13 +48,6 @@ public final class Commit implements LooseObject {
             .append(String.format("committer %s %s\n", committer, committerDate))
             .append('\n')
             .append(message).append('\n');
-        byte[] data = builder.toString().getBytes(StandardCharsets.UTF_8);
-        byte[] header = String
-            .format("commit %d\0", data.length)
-            .getBytes(StandardCharsets.UTF_8);
-        byte[] result = new byte[header.length + data.length];
-        System.arraycopy(header, 0, result, 0, header.length);
-        System.arraycopy(data, 0, result, header.length, data.length);
-        return result;
+        return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
 }
