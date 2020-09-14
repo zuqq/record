@@ -31,7 +31,7 @@ public final class File implements TreeNode {
     }
 
     @Override
-    public void accept(TreeVisitor visitor) {
+    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
         visitor.visit(this);
     }
 

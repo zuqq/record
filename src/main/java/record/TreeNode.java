@@ -20,5 +20,5 @@ public interface TreeNode {
         return result;
     }
 
-    public abstract void accept(TreeVisitor visitor);
+    public abstract <E extends Exception> void accept(TreeVisitor<E> visitor) throws E;
 }

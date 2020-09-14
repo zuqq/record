@@ -25,7 +25,7 @@ public final class Directory implements TreeNode {
     }
 
     @Override
-    public void accept(TreeVisitor visitor) {
+    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
         visitor.visitEnter(this);
         for (TreeNode child : tree.getChildren()) {
             child.accept(visitor);
