@@ -3,7 +3,7 @@ package record;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-public class SymbolicLink implements TreeNode {
+public final class SymbolicLink implements TreeNode {
     private final String name;
     private final Blob blob;
 
