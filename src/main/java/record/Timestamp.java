@@ -18,6 +18,10 @@ public final class Timestamp {
         this.timestamp = timestamp;
     }
 
+    public static ZonedDateTime of(String input) {
+        return ZonedDateTime.parse(input, formatter);
+    }
+
     @Override
     public String toString() {
         return timestamp.format(formatter);
