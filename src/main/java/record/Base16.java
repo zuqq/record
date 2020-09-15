@@ -1,6 +1,6 @@
 package record;
 
-import java.text.ParseException;
+import java.text.MessageFormat;
 
 public final class Base16 {
     private static String digits = "0123456789abcdef";
@@ -14,16 +14,18 @@ public final class Base16 {
         return String.valueOf(result);
     }
 
-    public static byte[] decode(String string) throws ParseException {
+    public static byte[] decode(String string) throws Base16ParseException {
         if (string.length() % 2 != 0) {
-            throw new ParseException("Input is of odd length.", 0);
+            throw new Base16ParseException("Input is of odd length.");
         }
         byte[] result = new byte[string.length() / 2];
         for (int i = 0; i < result.length; ++i) {
             int x = digits.indexOf(string.charAt(2 * i));
             int y = digits.indexOf(string.charAt(2 * i + 1));
             if (x == -1 || y == -1) {
-                throw new ParseException("Not a hexadecimal byte.", 2 * i);
+                throw new Base16ParseException(
+                    MessageFormat.format("Invalid hexadecimal byte at position {0}.", 2 * i)
+                );
             }
             result[i] = (byte) ((x << 4) + y);
         }

@@ -1,6 +1,5 @@
 package record;
 
-import java.text.ParseException;
 import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Assertions;
@@ -15,17 +14,8 @@ public class CommitTest {
     public static void setUp() {
         User user = new User("Jane Doe", "jane@example.com");
         Timestamp initialTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
-        Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
-        byte[] initialTreeHash = null;
-        byte[] secondTreeHash = null;
-        try {
-            initialTreeHash = Base16.decode("3683f870be446c7cc05ffaef9fa06415276e1828");
-            secondTreeHash = Base16.decode("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c");
-        } catch (ParseException e) {
-            Assertions.fail("Your test is broken!");
-        }
         initialCommit = new Commit(
-            new ObjectReference(initialTreeHash),
+            new ObjectReference(Base16.decode("3683f870be446c7cc05ffaef9fa06415276e1828")),
             new ObjectReference[] {},
             user,
             initialTimestamp,
@@ -33,8 +23,9 @@ public class CommitTest {
             initialTimestamp,
             "Initial commit"
         );
+        Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
         secondCommit = new Commit(
-            new ObjectReference(secondTreeHash),
+            new ObjectReference(Base16.decode("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c")),
             new ObjectReference[] {new ObjectReference(initialCommit.getHash())},
             user,
             secondTimestamp,
@@ -45,14 +36,10 @@ public class CommitTest {
     }
 
     @Test
-    void initialCommitGetHash() {
+    void getHash() {
         Assertions.assertEquals(
             "42a22126b2d4fef6dd6537ecad0e63be1bc4c210", Base16.encode(initialCommit.getHash())
         );
-    }
-
-    @Test
-    void secondCommitGetHash() {
         Assertions.assertEquals(
             "79d5cd29da3d56d9abda7e83d2b2bd52d43db939", Base16.encode(secondCommit.getHash())
         );

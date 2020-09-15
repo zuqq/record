@@ -1,7 +1,5 @@
 package record;
 
-import java.text.ParseException;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +21,7 @@ public class Base16Test {
     void decode() {
         try {
             Assertions.assertArrayEquals(bytes, Base16.decode(string));
-        } catch (ParseException e) {
+        } catch (Base16ParseException e) {
             Assertions.fail("Parser failed on valid input.");
         }
     }
