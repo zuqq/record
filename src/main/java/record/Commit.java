@@ -3,8 +3,8 @@ package record;
 import java.nio.charset.StandardCharsets;
 
 public final class Commit implements LooseObject {
-    private final Tree tree;
-    private final Commit[] parents;
+    private final ObjectReference tree;
+    private final ObjectReference[] parents;
     private final User author;
     private final Timestamp authorDate;
     private final User committer;
@@ -12,8 +12,8 @@ public final class Commit implements LooseObject {
     private final String message;
 
     public Commit(
-        Tree tree,
-        Commit[] parents,
+        ObjectReference tree,
+        ObjectReference[] parents,
         User author,
         Timestamp authorDate,
         User committer,
@@ -37,11 +37,9 @@ public final class Commit implements LooseObject {
     @Override
     public byte[] getBody() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
-        StringBuilder builder = new StringBuilder(
-            String.format("tree %s\n", Base16.encode(tree.getHash()))
-        );
-        for (Commit parent : parents) {
-            builder.append(String.format("parent %s\n", Base16.encode(parent.getHash())));
+        StringBuilder builder = new StringBuilder(String.format("tree %s\n", tree));
+        for (ObjectReference parent : parents) {
+            builder.append(String.format("parent %s\n", parent));
         }
         builder
             .append(String.format("author %s %s\n", author, authorDate))

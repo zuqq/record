@@ -2,11 +2,11 @@ package record;
 
 public final class Directory implements TreeNode {
     private final String name;
-    private final Tree tree;
+    private final ObjectReference treeReference;
 
-    public Directory(String name, Tree tree) {
+    public Directory(String name, ObjectReference treeReference) {
         this.name = name;
-        this.tree = tree;
+        this.treeReference = treeReference;
     }
 
     @Override
@@ -20,16 +20,7 @@ public final class Directory implements TreeNode {
     }
 
     @Override
-    public byte[] getHash() {
-        return tree.getHash();
-    }
-
-    @Override
-    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
-        visitor.visitEnter(this);
-        for (TreeNode child : tree.getChildren()) {
-            child.accept(visitor);
-        }
-        visitor.visitLeave(this);
+    public byte[] getTargetHash() {
+        return treeReference.getTargetHash();
     }
 }

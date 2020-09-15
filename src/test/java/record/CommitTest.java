@@ -1,6 +1,6 @@
 package record;
 
-import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Assertions;
@@ -13,24 +13,29 @@ public class CommitTest {
 
     @BeforeAll
     public static void setUp() {
-        File a = new File(false, "a", new Blob("a\n".getBytes(StandardCharsets.UTF_8)));
-        File b = new File(false, "b", new Blob("b\n".getBytes(StandardCharsets.UTF_8)));
-        File c = new File(false, "c", new Blob("more stuff\n".getBytes(StandardCharsets.UTF_8)));
         User user = new User("Jane Doe", "jane@example.com");
         Timestamp initialTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
+        Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
+        byte[] initialTreeHash = null;
+        byte[] secondTreeHash = null;
+        try {
+            initialTreeHash = Base16.decode("3683f870be446c7cc05ffaef9fa06415276e1828");
+            secondTreeHash = Base16.decode("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c");
+        } catch (ParseException e) {
+            Assertions.fail("Your test is broken!");
+        }
         initialCommit = new Commit(
-            new Tree(new TreeNode[] {a, b}),
-            new Commit[] {},
+            new ObjectReference(initialTreeHash),
+            new ObjectReference[] {},
             user,
             initialTimestamp,
             user,
             initialTimestamp,
             "Initial commit"
         );
-        Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
         secondCommit = new Commit(
-            new Tree(new TreeNode[] {a, b, c}),
-            new Commit[] {initialCommit},
+            new ObjectReference(secondTreeHash),
+            new ObjectReference[] {new ObjectReference(initialCommit.getHash())},
             user,
             secondTimestamp,
             user,

@@ -3,12 +3,12 @@ package record;
 public final class File implements TreeNode {
     private final boolean executable;
     private final String name;
-    private final Blob blob;
+    private final ObjectReference blobReference;
 
-    public File(boolean executable, String name, Blob blob) {
+    public File(boolean executable, String name, ObjectReference blobReference) {
         this.executable = executable;
         this.name = name;
-        this.blob = blob;
+        this.blobReference = blobReference;
     }
 
     @Override
@@ -26,16 +26,7 @@ public final class File implements TreeNode {
     }
 
     @Override
-    public byte[] getHash() {
-        return blob.getHash();
-    }
-
-    @Override
-    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
-        visitor.visit(this);
-    }
-
-    public byte[] getBytes() {
-        return blob.getBody();
+    public byte[] getTargetHash() {
+        return blobReference.getTargetHash();
     }
 }

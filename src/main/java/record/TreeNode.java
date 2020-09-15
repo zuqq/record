@@ -7,7 +7,7 @@ public interface TreeNode {
 
     public abstract String getName();
 
-    public abstract byte[] getHash();
+    public abstract byte[] getTargetHash();
 
     public default byte[] toEntry() {
         byte[] part = String
@@ -15,10 +15,8 @@ public interface TreeNode {
             .getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[part.length + 20];
         System.arraycopy(part, 0, result, 0, part.length);
-        byte[] hash = getHash();
+        byte[] hash = getTargetHash();
         System.arraycopy(hash, 0, result, part.length, hash.length);
         return result;
     }
-
-    public abstract <E extends Exception> void accept(TreeVisitor<E> visitor) throws E;
 }

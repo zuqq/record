@@ -23,16 +23,7 @@ public final class SymbolicLink implements TreeNode {
     }
 
     @Override
-    public byte[] getHash() {
+    public byte[] getTargetHash() {
         return blob.getHash();
-    }
-
-    @Override
-    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
-        visitor.visit(this);
-    }
-
-    public byte[] getBytes() {
-        return blob.getBody();
     }
 }
