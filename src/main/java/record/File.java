@@ -3,9 +3,9 @@ package record;
 public final class File implements TreeNode {
     private final boolean executable;
     private final String name;
-    private final ObjectReference blobReference;
+    private final ObjectReference<Blob> blobReference;
 
-    public File(boolean executable, String name, ObjectReference blobReference) {
+    public File(boolean executable, String name, ObjectReference<Blob> blobReference) {
         this.executable = executable;
         this.name = name;
         this.blobReference = blobReference;

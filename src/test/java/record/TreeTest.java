@@ -3,20 +3,22 @@ package record;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 public class TreeTest {
     private static Tree tree = new Tree(
-        new TreeNode[] {
+        Arrays.asList(
             new File(
                 false,
                 "a",
-                new ObjectReference(Base16.decode("78981922613b2afb6025042ff6bd878ac1994e85"))
+                new ObjectReference<>(Base16.decode("78981922613b2afb6025042ff6bd878ac1994e85"))
             ),
             new File(
                 false,
                 "b",
-                new ObjectReference(Base16.decode("61780798228d17af2d34fce4cfbdf35556832472"))
+                new ObjectReference<>(Base16.decode("61780798228d17af2d34fce4cfbdf35556832472"))
             )
-        }
+        )
     );
 
     @Test

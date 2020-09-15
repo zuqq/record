@@ -1,6 +1,6 @@
 package record;
 
-public class ObjectReference {
+public class ObjectReference<T extends LooseObject> {
     private final byte[] targetHash;
 
     public ObjectReference(byte[] targetHash) {

@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.DeflaterOutputStream;
 
 public final class Repository {
@@ -47,13 +48,13 @@ public final class Repository {
     private class TreeBuilder extends SimpleFileVisitor<Path> {
         private final Path target;
         private final Map<Path, TreeNode> store = new HashMap<>();
-        private ObjectReference result = null;
+        private ObjectReference<Tree> result = null;
 
         public TreeBuilder(Path target) {
             this.target = target;
         }
 
-        public ObjectReference getResult() {
+        public ObjectReference<Tree> getResult() {
             return result;
         }
 
@@ -83,9 +84,9 @@ public final class Repository {
                     }
                 }
             }
-            Tree tree = new Tree(children.toArray(new TreeNode[] {}));
+            Tree tree = new Tree(children);
             writeObject(tree);
-            ObjectReference treeReference = new ObjectReference(tree.getHash());
+            ObjectReference<Tree> treeReference = new ObjectReference<>(tree.getHash());
             store.put(dir, new Directory(dir.getFileName().toString(), treeReference));
             if (dir.equals(target)) {
                 result = treeReference;
@@ -108,7 +109,7 @@ public final class Repository {
                     node = new File(
                         Files.isExecutable(file),
                         file.getFileName().toString(),
-                        new ObjectReference(blob.getHash())
+                        new ObjectReference<>(blob.getHash())
                     );
                 }
                 store.put(file, node);
@@ -117,14 +118,14 @@ public final class Repository {
         }
     }
 
-    private ObjectReference readTree() throws IOException {
+    private ObjectReference<Tree> readTree() throws IOException {
         TreeBuilder visitor = new TreeBuilder(folder);
         Files.walkFileTree(folder, visitor);
         return visitor.getResult();
     }
 
     // Returns `Optional.empty()` if and only if HEAD points to an empty branch.
-    private Optional<ObjectReference> readHead() throws IOException {
+    private Optional<ObjectReference<Commit>> readHead() throws IOException {
         // TODO: Factor our commonalities of `readHead` and `writeHead`.
         String content = Files.readString(folder.resolve(".git/HEAD"));
         String encodedHash = null;
@@ -140,10 +141,10 @@ public final class Repository {
             // HEAD contains the Base16-encoded hash of a commit.
             encodedHash = content;
         }
-        return Optional.of(new ObjectReference(Base16.decode(encodedHash)));
+        return Optional.of(new ObjectReference<>(Base16.decode(encodedHash)));
     }
 
-    private void writeHead(ObjectReference commitReference) throws IOException {
+    private void writeHead(ObjectReference<Commit> commitReference) throws IOException {
         String content = Files.readString(folder.resolve(".git/HEAD"));
         Path target = null;
         if (content.startsWith("ref: ")) {
@@ -158,7 +159,7 @@ public final class Repository {
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
         Commit commit = new Commit(
             readTree(),
-            readHead().stream().toArray(ObjectReference[]::new),
+            readHead().stream().collect(Collectors.toList()),
             user,
             timestamp,
             user,
@@ -166,6 +167,6 @@ public final class Repository {
             message
         );
         writeObject(commit);
-        writeHead(new ObjectReference(commit.getHash()));
+        writeHead(new ObjectReference<>(commit.getHash()));
     }
 }

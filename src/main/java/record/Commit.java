@@ -1,10 +1,11 @@
 package record;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public final class Commit implements LooseObject {
-    private final ObjectReference tree;
-    private final ObjectReference[] parents;
+    private final ObjectReference<Tree> tree;
+    private final List<ObjectReference<Commit>> parents;
     private final User author;
     private final Timestamp authorDate;
     private final User committer;
@@ -12,8 +13,8 @@ public final class Commit implements LooseObject {
     private final String message;
 
     public Commit(
-        ObjectReference tree,
-        ObjectReference[] parents,
+        ObjectReference<Tree> tree,
+        List<ObjectReference<Commit>> parents,
         User author,
         Timestamp authorDate,
         User committer,
@@ -38,7 +39,7 @@ public final class Commit implements LooseObject {
     public byte[] getBody() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
         StringBuilder builder = new StringBuilder(String.format("tree %s\n", tree));
-        for (ObjectReference parent : parents) {
+        for (ObjectReference<Commit> parent : parents) {
             builder.append(String.format("parent %s\n", parent));
         }
         builder
