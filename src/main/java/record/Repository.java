@@ -5,7 +5,10 @@ import java.io.OutputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 
 public final class Repository {
@@ -121,7 +124,7 @@ public final class Repository {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             if (!Files.isHidden(file)) {
-                TreeNode node = null;
+                TreeNode node;
                 if (Files.isSymbolicLink(file)) {
                     node = new SymbolicLink(
                         file.getFileName().toString(),

@@ -12,10 +12,6 @@ public final class Tree implements LooseObject {
         this.children = children;
     }
 
-    public List<TreeNode> getChildren() {
-        return children;
-    }
-
     @Override
     public String getTag() {
         return "tree";

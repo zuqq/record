@@ -5,11 +5,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public interface LooseObject {
-    public abstract String getTag();
+    String getTag();
 
-    public abstract byte[] getBody();
+    byte[] getBody();
 
-    public default byte[] getBytes() {
+    default byte[] getBytes() {
         byte[] body = getBody();
         byte[] header = String
             .format("%s %d\0", getTag(), body.length)
@@ -20,8 +20,8 @@ public interface LooseObject {
         return result;
     }
 
-    public default byte[] getHash() {
-        MessageDigest md = null;
+    default byte[] getHash() {
+        MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-1");
         } catch (NoSuchAlgorithmException e) {

@@ -3,13 +3,13 @@ package record;
 import java.nio.charset.StandardCharsets;
 
 public interface TreeNode {
-    public abstract String getMode();
+    String getMode();
 
-    public abstract String getName();
+    String getName();
 
-    public abstract byte[] getTargetHash();
+    byte[] getTargetHash();
 
-    public default byte[] toEntry() {
+    default byte[] toEntry() {
         byte[] part = String
             .format("%s %s\0", getMode(), getName())
             .getBytes(StandardCharsets.UTF_8);

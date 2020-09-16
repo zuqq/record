@@ -3,7 +3,7 @@ package record;
 import java.text.MessageFormat;
 
 public final class Base16 {
-    private static String digits = "0123456789abcdef";
+    private static final String digits = "0123456789abcdef";
 
     public static String encode(byte[] data) {
         char[] result = new char[2 * data.length];

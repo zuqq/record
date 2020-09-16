@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 public class TreeTest {
-    private static Tree tree = new Tree(
+    private static final Tree tree = new Tree(
         Arrays.asList(
             new File(
                 false,

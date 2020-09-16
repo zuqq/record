@@ -18,8 +18,8 @@ public final class Timestamp {
         this.timestamp = timestamp;
     }
 
-    public static ZonedDateTime of(String input) {
-        return ZonedDateTime.parse(input, formatter);
+    public static Timestamp of(String input) {
+        return new Timestamp(ZonedDateTime.parse(input, formatter));
     }
 
     @Override

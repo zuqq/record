@@ -1,7 +1,6 @@
 package record;
 
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.Arrays;
 
 public final class Blob implements LooseObject {
