@@ -11,7 +11,7 @@ public final class Blob implements LooseObject {
         this.data = data;
     }
 
-    public static Blob parse(byte[] input) throws LooseObjectParseException {
+    public static Blob parse(byte[] input) throws FatalParseException {
         int i = 0;
         for (; i < input.length; ++i) {
             if (input[i] == 0) {
@@ -20,11 +20,11 @@ public final class Blob implements LooseObject {
         }
         String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
         if (!header.startsWith("blob ")) {
-            throw new LooseObjectParseException("Malformed header.");
+            throw new FatalParseException("Malformed header.");
         }
         byte[] data = Arrays.copyOfRange(input, i + 1, input.length);
         if (Integer.parseInt(header.substring(5)) != data.length) {
-            throw new LooseObjectParseException("Header contains incorrect length.");
+            throw new FatalParseException("Header contains incorrect length.");
         }
         return new Blob(data);
     }

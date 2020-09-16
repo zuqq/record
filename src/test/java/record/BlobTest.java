@@ -14,7 +14,7 @@ public class BlobTest {
     void parse() {
         try {
             Assertions.assertEquals(Blob.parse(a.getBytes()), a);
-        } catch (LooseObjectParseException e) {
+        } catch (FatalParseException e) {
             Assertions.fail("Parser failed on valid input.", e);
         }
     }

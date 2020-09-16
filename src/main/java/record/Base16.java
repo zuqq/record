@@ -14,16 +14,16 @@ public final class Base16 {
         return String.valueOf(result);
     }
 
-    public static byte[] decode(String string) throws Base16ParseException {
+    public static byte[] decode(String string) throws FatalParseException {
         if (string.length() % 2 != 0) {
-            throw new Base16ParseException("Input is of odd length.");
+            throw new FatalParseException("Input is of odd length.");
         }
         byte[] result = new byte[string.length() / 2];
         for (int i = 0; i < result.length; ++i) {
             int x = digits.indexOf(string.charAt(2 * i));
             int y = digits.indexOf(string.charAt(2 * i + 1));
             if (x == -1 || y == -1) {
-                throw new Base16ParseException(
+                throw new FatalParseException(
                     MessageFormat.format("Invalid hexadecimal byte at position {0}.", 2 * i)
                 );
             }

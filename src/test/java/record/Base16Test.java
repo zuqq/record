@@ -21,7 +21,7 @@ public class Base16Test {
     void decode() {
         try {
             Assertions.assertArrayEquals(bytes, Base16.decode(string));
-        } catch (Base16ParseException e) {
+        } catch (FatalParseException e) {
             Assertions.fail("Parser failed on valid input.");
         }
     }
