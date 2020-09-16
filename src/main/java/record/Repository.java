@@ -48,13 +48,13 @@ public final class Repository {
     private class TreeBuilder extends SimpleFileVisitor<Path> {
         private final Path target;
         private final Map<Path, TreeNode> store = new HashMap<>();
-        private ObjectReference<Tree> result = null;
+        private LooseObjectReference<Tree> result = null;
 
         public TreeBuilder(Path target) {
             this.target = target;
         }
 
-        public ObjectReference<Tree> getResult() {
+        public LooseObjectReference<Tree> getResult() {
             return result;
         }
 
@@ -86,7 +86,7 @@ public final class Repository {
             }
             Tree tree = new Tree(children);
             writeObject(tree);
-            ObjectReference<Tree> treeReference = new ObjectReference<>(tree.getHash());
+            LooseObjectReference<Tree> treeReference = new LooseObjectReference<>(tree.getHash());
             store.put(dir, new Directory(dir.getFileName().toString(), treeReference));
             if (dir.equals(target)) {
                 result = treeReference;
@@ -109,7 +109,7 @@ public final class Repository {
                     node = new File(
                         Files.isExecutable(file),
                         file.getFileName().toString(),
-                        new ObjectReference<>(blob.getHash())
+                        new LooseObjectReference<>(blob.getHash())
                     );
                 }
                 store.put(file, node);
@@ -118,14 +118,14 @@ public final class Repository {
         }
     }
 
-    private ObjectReference<Tree> readTree() throws IOException {
+    private LooseObjectReference<Tree> readTree() throws IOException {
         TreeBuilder visitor = new TreeBuilder(folder);
         Files.walkFileTree(folder, visitor);
         return visitor.getResult();
     }
 
     // Returns `Optional.empty()` if and only if HEAD points to an empty branch.
-    private Optional<ObjectReference<Commit>> readHead() throws IOException {
+    private Optional<LooseObjectReference<Commit>> readHead() throws IOException {
         // TODO: Factor our commonalities of `readHead` and `writeHead`.
         String content = Files.readString(folder.resolve(".git/HEAD"));
         String encodedHash = null;
@@ -141,10 +141,10 @@ public final class Repository {
             // HEAD contains the Base16-encoded hash of a commit.
             encodedHash = content;
         }
-        return Optional.of(new ObjectReference<>(Base16.decode(encodedHash)));
+        return Optional.of(new LooseObjectReference<>(Base16.decode(encodedHash)));
     }
 
-    private void writeHead(ObjectReference<Commit> commitReference) throws IOException {
+    private void writeHead(LooseObjectReference<Commit> commitReference) throws IOException {
         String content = Files.readString(folder.resolve(".git/HEAD"));
         Path target = null;
         if (content.startsWith("ref: ")) {
@@ -167,6 +167,6 @@ public final class Repository {
             message
         );
         writeObject(commit);
-        writeHead(new ObjectReference<>(commit.getHash()));
+        writeHead(new LooseObjectReference<>(commit.getHash()));
     }
 }

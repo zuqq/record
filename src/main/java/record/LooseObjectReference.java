@@ -1,9 +1,9 @@
 package record;
 
-public class ObjectReference<T extends LooseObject> {
+public class LooseObjectReference<T extends LooseObject> {
     private final byte[] targetHash;
 
-    public ObjectReference(byte[] targetHash) {
+    public LooseObjectReference(byte[] targetHash) {
         if (targetHash.length != 20) {
             throw new IllegalArgumentException("Expected 20 bytes.");
         }

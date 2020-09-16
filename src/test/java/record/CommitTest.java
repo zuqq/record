@@ -17,7 +17,7 @@ public class CommitTest {
         User user = new User("Jane Doe", "jane@example.com");
         Timestamp initialTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:39:49+02:00"));
         initialCommit = new Commit(
-            new ObjectReference<>(Base16.decode("3683f870be446c7cc05ffaef9fa06415276e1828")),
+            new LooseObjectReference<>(Base16.decode("3683f870be446c7cc05ffaef9fa06415276e1828")),
             new ArrayList<>(),
             user,
             initialTimestamp,
@@ -27,8 +27,8 @@ public class CommitTest {
         );
         Timestamp secondTimestamp = new Timestamp(ZonedDateTime.parse("2020-09-08T14:40:10+02:00"));
         secondCommit = new Commit(
-            new ObjectReference<>(Base16.decode("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c")),
-            Arrays.asList(new ObjectReference<>(initialCommit.getHash())),
+            new LooseObjectReference<>(Base16.decode("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c")),
+            Arrays.asList(new LooseObjectReference<>(initialCommit.getHash())),
             user,
             secondTimestamp,
             user,

@@ -2,9 +2,9 @@ package record;
 
 public final class Directory implements TreeNode {
     private final String name;
-    private final ObjectReference<Tree> treeReference;
+    private final LooseObjectReference<Tree> treeReference;
 
-    public Directory(String name, ObjectReference<Tree> treeReference) {
+    public Directory(String name, LooseObjectReference<Tree> treeReference) {
         this.name = name;
         this.treeReference = treeReference;
     }
