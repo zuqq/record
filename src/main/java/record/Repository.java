@@ -6,33 +6,60 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.DeflaterOutputStream;
 
 public final class Repository {
-    Path folder;
-    User user;  // TODO: Read this from ".git/config" or the system-wide configuration.
+    private final Path folder;
+    private final Path git;
+    private final User user;  // TODO: Read this from ".git/config" or the system-wide configuration.
 
     public Repository(Path folder, User user) {
         this.folder = folder;
+        this.git = folder.resolve(".git");
         this.user = user;
     }
 
-    public void init() throws IOException {
-        Path git = folder.resolve(".git");
-        if (Files.exists(git)) {
-            // TODO: Re-initialize the repository.
-            throw new IllegalStateException("Repository already exists.");
+    private ReferenceContent readReference(String name) throws IOException {
+        // TODO: Make a method that returns the path corresponding to the name.
+        String content = Files.readString(git.resolve(name));
+        // Remove trailing '\n'.
+        return new ReferenceContent(content.substring(0, content.length() - 1));
+    }
+
+    private void writeReference(String name, ReferenceContent content) throws IOException {
+        // Add trailing '\n'.
+        Files.writeString(git.resolve(name), content.toString() + "\n");
+    }
+
+    private String resolveReference(String name) throws IOException {
+        // Follow the reference until we find one that is empty (i.e., the
+        // corresponding file doesn't exist) or points to a commit (i.e., it is
+        // not symbolic). Set a maximal number of hops to avoid looping forever.
+        for (int i = 0; i < 5; ++i) {
+            if (!Files.exists(git.resolve(name))) {
+                return name;
+            }
+            ReferenceContent content = readReference(name);
+            if (!content.isSymbolic()) {
+                return name;
+            }
+            name = content.getTarget();
         }
-        // TODO: These paths deserve accessors.
-        Files.createDirectories(git.resolve("objects"));
-        Files.createDirectories(git.resolve("refs/heads"));
-        Files.writeString(git.resolve("HEAD"), "ref: refs/heads/master\n");
+        throw new RuntimeException("Circular reference.");
+    }
+
+    public void init() throws IOException {
+        if (!Files.exists(git)) {
+            Files.createDirectories(git.resolve("objects"));
+            Files.createDirectories(git.resolve("refs/heads"));
+            Files.createDirectories(git.resolve("refs/tags"));
+            writeReference("HEAD", new ReferenceContent(true, "refs/heads/master"));
+        }
     }
 
     private void writeObject(LooseObject object) throws IOException {
         String encodedHash = Base16.encode(object.getHash());
-        Path bucket = folder.resolve(".git").resolve("objects").resolve(encodedHash.substring(0, 2));
+        Path bucket = git.resolve("objects").resolve(encodedHash.substring(0, 2));
         if (!Files.exists(bucket)) {
             Files.createDirectory(bucket);
         }
@@ -60,10 +87,7 @@ public final class Repository {
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            if (Files.isHidden(dir)) {
-                return FileVisitResult.SKIP_SUBTREE;
-            }
-            return FileVisitResult.CONTINUE;
+            return Files.isHidden(dir) ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
         }
 
         @Override
@@ -96,8 +120,8 @@ public final class Repository {
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            TreeNode node = null;
             if (!Files.isHidden(file)) {
+                TreeNode node = null;
                 if (Files.isSymbolicLink(file)) {
                     node = new SymbolicLink(
                         file.getFileName().toString(),
@@ -124,49 +148,17 @@ public final class Repository {
         return visitor.getResult();
     }
 
-    // Returns `Optional.empty()` if and only if HEAD points to an empty branch.
-    private Optional<LooseObjectReference<Commit>> readHead() throws IOException {
-        // TODO: Factor our commonalities of `readHead` and `writeHead`.
-        String content = Files.readString(folder.resolve(".git/HEAD"));
-        String encodedHash = null;
-        if (content.startsWith("ref: ")) {
-            // HEAD contains a symbolic reference.
-            // TODO: Symbolic references deserve their own type.
-            Path target = folder.resolve(".git").resolve(content.substring(5).stripTrailing());
-            if (!Files.exists(target)) {
-                return Optional.empty();
-            }
-            encodedHash = Files.readString(target);
-        } else {
-            // HEAD contains the Base16-encoded hash of a commit.
-            encodedHash = content;
-        }
-        return Optional.of(new LooseObjectReference<>(Base16.decode(encodedHash)));
-    }
-
-    private void writeHead(LooseObjectReference<Commit> commitReference) throws IOException {
-        String content = Files.readString(folder.resolve(".git/HEAD"));
-        Path target = null;
-        if (content.startsWith("ref: ")) {
-            target = folder.resolve(".git").resolve(content.substring(5).stripTrailing());
-        } else {
-            target = folder.resolve(".git/HEAD");
-        }
-        Files.writeString(target, commitReference.toString() + "\n");
-    }
-
     public void commit(String message) throws IOException {
+        String head = resolveReference("HEAD");
+        LooseObjectReference<Tree> treeReference = readTree();
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
-        Commit commit = new Commit(
-            readTree(),
-            readHead().stream().collect(Collectors.toList()),
-            user,
-            timestamp,
-            user,
-            timestamp,
-            message
-        );
+        List<LooseObjectReference<Commit>> parents = new ArrayList<>();
+        if (Files.exists(git.resolve(head))) {
+            parents.add(new LooseObjectReference<>(Base16.decode(readReference(head).getTarget())));
+        }
+        Commit commit = new Commit(treeReference, parents, user, timestamp, user, timestamp, message);
         writeObject(commit);
-        writeHead(new LooseObjectReference<>(commit.getHash()));
+        LooseObjectReference<Commit> commitReference = new LooseObjectReference<>(commit.getHash());
+        writeReference(head, new ReferenceContent(commitReference.toString()));
     }
 }
