@@ -14,12 +14,10 @@ import java.util.zip.DeflaterOutputStream;
 public final class Repository {
     private final Path folder;
     private final Path git;
-    private final User user;  // TODO: Read this from ".git/config" or the system-wide configuration.
 
-    public Repository(Path folder, User user) {
+    public Repository(Path folder) {
         this.folder = folder;
         this.git = folder.resolve(".git");
-        this.user = user;
     }
 
     private ReferenceContent readReference(String name) throws IOException {
@@ -151,7 +149,7 @@ public final class Repository {
         return visitor.getResult();
     }
 
-    public void commit(String message) throws IOException {
+    public void commit(User user, String message) throws IOException {
         String head = resolveReference("HEAD");
         LooseObjectReference<Tree> treeReference = readTree();
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
