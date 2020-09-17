@@ -21,7 +21,6 @@ public final class Repository {
     }
 
     private ReferenceContent readReference(String name) throws IOException {
-        // TODO: Make a method that returns the path corresponding to the name.
         String content = Files.readString(git.resolve(name));
         // Remove trailing '\n'.
         return new ReferenceContent(content.substring(0, content.length() - 1));
@@ -64,12 +63,9 @@ public final class Repository {
         if (!Files.exists(bucket)) {
             Files.createDirectory(bucket);
         }
-        try (
-            OutputStream file = Files.newOutputStream(bucket.resolve(encodedHash.substring(2)));
-            DeflaterOutputStream stream = new DeflaterOutputStream(file)
-        ) {
+        try (OutputStream file = Files.newOutputStream(bucket.resolve(encodedHash.substring(2)));
+             DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
             stream.write(object.getBytes());
-            stream.flush();
         }
     }
 
@@ -151,13 +147,12 @@ public final class Repository {
 
     public void commit(User user, String message) throws IOException {
         String head = resolveReference("HEAD");
-        LooseObjectReference<Tree> treeReference = readTree();
-        Timestamp timestamp = new Timestamp(ZonedDateTime.now());
         List<LooseObjectReference<Commit>> parents = new ArrayList<>();
         if (Files.exists(git.resolve(head))) {
             parents.add(new LooseObjectReference<>(Base16.decode(readReference(head).getTarget())));
         }
-        Commit commit = new Commit(treeReference, parents, user, timestamp, user, timestamp, message);
+        Timestamp timestamp = new Timestamp(ZonedDateTime.now());
+        Commit commit = new Commit(readTree(), parents, user, timestamp, user, timestamp, message);
         writeObject(commit);
         LooseObjectReference<Commit> commitReference = new LooseObjectReference<>(commit.getHash());
         writeReference(head, new ReferenceContent(commitReference.toString()));

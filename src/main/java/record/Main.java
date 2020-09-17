@@ -7,8 +7,8 @@ import java.util.Arrays;
 
 public class Main {
     private static final String usage = "Usage:\n"
-            + "\trecord init\n"
-            + "\trecord commit NAME E-MAIL MESSAGE\n";
+                + "\trecord init\n"
+                + "\trecord commit NAME E-MAIL MESSAGE\n";
 
     public static void main(String[] args) throws IOException {
         Path folder = Paths.get(".").toAbsolutePath().normalize();
