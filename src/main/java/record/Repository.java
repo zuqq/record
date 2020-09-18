@@ -45,7 +45,7 @@ public final class Repository {
             }
             name = content.getTarget();
         }
-        throw new RuntimeException("Circular reference.");
+        throw new RuntimeException("Too many redirects.");
     }
 
     public void init() throws IOException {

@@ -2,6 +2,9 @@ package record;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * A node in a {@link Tree}.
+ */
 public interface TreeNode {
     String getMode();
 

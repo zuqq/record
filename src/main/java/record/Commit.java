@@ -3,6 +3,9 @@ package record;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * A git commit object.
+ */
 public final class Commit implements LooseObject {
     private final LooseObjectReference<Tree> treeReference;
     private final List<LooseObjectReference<Commit>> parents;

@@ -2,9 +2,15 @@ package record;
 
 import java.text.MessageFormat;
 
+/**
+ * Conversion to and from Base16.
+ */
 public final class Base16 {
     private static final String digits = "0123456789abcdef";
 
+    /**
+     * Convert bytes into Base16.
+     */
     public static String encode(byte[] data) {
         char[] result = new char[2 * data.length];
         for (int i = 0; i < data.length; ++i) {
@@ -14,6 +20,9 @@ public final class Base16 {
         return String.valueOf(result);
     }
 
+    /**
+     * Convert Base16 into bytes.
+     */
     public static byte[] decode(String string) throws FatalParseException {
         if (string.length() % 2 != 0) {
             throw new FatalParseException("Input is of odd length.");

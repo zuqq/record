@@ -3,6 +3,11 @@ package record;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+/**
+ * A git blob object.
+ *
+ * Blobs are (anonymous) snapshots of files.
+ */
 public final class Blob implements LooseObject {
     private final byte[] data;
 

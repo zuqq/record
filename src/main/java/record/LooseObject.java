@@ -4,11 +4,17 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Loose (i.e., non-packfile) git objects.
+ */
 public interface LooseObject {
     String getTag();
 
     byte[] getBody();
 
+    /**
+     * Returns the object's uncompressed content.
+     */
     default byte[] getBytes() {
         byte[] body = getBody();
         byte[] header = String
@@ -20,6 +26,9 @@ public interface LooseObject {
         return result;
     }
 
+    /**
+     * Returns the object's SHA-1 digest ("hash").
+     */
     default byte[] getHash() {
         MessageDigest md;
         try {
