@@ -11,12 +11,12 @@ public class TreeTest {
             new File(
                 false,
                 "a",
-                new LooseObjectReference<>(Base16.decode("78981922613b2afb6025042ff6bd878ac1994e85"))
+                new LooseObjectReference<>("78981922613b2afb6025042ff6bd878ac1994e85")
             ),
             new File(
                 false,
                 "b",
-                new LooseObjectReference<>(Base16.decode("61780798228d17af2d34fce4cfbdf35556832472"))
+                new LooseObjectReference<>("61780798228d17af2d34fce4cfbdf35556832472")
             )
         )
     );

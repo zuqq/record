@@ -16,7 +16,7 @@ public class CommitTest {
         User user = new User("Jane Doe", "jane@example.com");
         Timestamp initialTimestamp = Timestamp.of("1599568789 +0200");
         initialCommit = new Commit(
-            new LooseObjectReference<>(Base16.decode("3683f870be446c7cc05ffaef9fa06415276e1828")),
+            new LooseObjectReference<>("3683f870be446c7cc05ffaef9fa06415276e1828"),
             new ArrayList<>(),
             user,
             initialTimestamp,
@@ -26,7 +26,7 @@ public class CommitTest {
         );
         Timestamp secondTimestamp = Timestamp.of("1599568810 +0200");
         secondCommit = new Commit(
-            new LooseObjectReference<>(Base16.decode("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c")),
+            new LooseObjectReference<>("5e1dd7430fe0d9b1678543ae1a318485d69fdd2c"),
             Collections.singletonList(new LooseObjectReference<>(initialCommit.getHash())),
             user,
             secondTimestamp,

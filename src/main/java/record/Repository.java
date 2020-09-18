@@ -107,7 +107,7 @@ public final class Repository {
             }
             Tree tree = new Tree(children);
             writeObject(tree);
-            LooseObjectReference<Tree> treeReference = new LooseObjectReference<>(tree.getHash());
+            LooseObjectReference<Tree> treeReference = new LooseObjectReference<>(tree);
             store.put(dir, new Directory(dir.getFileName().toString(), treeReference));
             if (dir.equals(target)) {
                 result = treeReference;
@@ -130,7 +130,7 @@ public final class Repository {
                     node = new File(
                         Files.isExecutable(file),
                         file.getFileName().toString(),
-                        new LooseObjectReference<>(blob.getHash())
+                        new LooseObjectReference<>(blob)
                     );
                 }
                 store.put(file, node);
@@ -149,12 +149,12 @@ public final class Repository {
         String head = resolveReference("HEAD");
         List<LooseObjectReference<Commit>> parents = new ArrayList<>();
         if (Files.exists(git.resolve(head))) {
-            parents.add(new LooseObjectReference<>(Base16.decode(readReference(head).getTarget())));
+            parents.add(new LooseObjectReference<>(readReference(head).getTarget()));
         }
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
         Commit commit = new Commit(readTree(), parents, user, timestamp, user, timestamp, message);
         writeObject(commit);
-        LooseObjectReference<Commit> commitReference = new LooseObjectReference<>(commit.getHash());
+        LooseObjectReference<Commit> commitReference = new LooseObjectReference<>(commit);
         writeReference(head, new ReferenceContent(commitReference.toString()));
     }
 }

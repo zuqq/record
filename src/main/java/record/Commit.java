@@ -7,7 +7,7 @@ import java.util.List;
  * A git commit object.
  */
 public final class Commit implements LooseObject {
-    private final LooseObjectReference<Tree> treeReference;
+    private final LooseObjectReference<Tree> tree;
     private final List<LooseObjectReference<Commit>> parents;
     private final User author;
     private final Timestamp authorDate;
@@ -15,14 +15,14 @@ public final class Commit implements LooseObject {
     private final Timestamp committerDate;
     private final String message;
 
-    public Commit(LooseObjectReference<Tree> treeReference,
+    public Commit(LooseObjectReference<Tree> tree,
                   List<LooseObjectReference<Commit>> parents,
                   User author,
                   Timestamp authorDate,
                   User committer,
                   Timestamp committerDate,
                   String message) {
-        this.treeReference = treeReference;
+        this.tree = tree;
         this.parents = parents;
         this.author = author;
         this.authorDate = authorDate;
@@ -39,7 +39,7 @@ public final class Commit implements LooseObject {
     @Override
     public byte[] getBody() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
-        StringBuilder builder = new StringBuilder(String.format("tree %s\n", treeReference));
+        StringBuilder builder = new StringBuilder(String.format("tree %s\n", tree));
         for (LooseObjectReference<Commit> parent : parents) {
             builder.append(String.format("parent %s\n", parent));
         }

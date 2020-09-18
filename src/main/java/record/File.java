@@ -3,12 +3,14 @@ package record;
 public final class File implements TreeNode {
     private final boolean executable;
     private final String name;
-    private final LooseObjectReference<Blob> blobReference;
+    // This uses a `LooseObjectReference` instead of just storing the hash
+    // because that gives me greater type safety in `Repository::TreeBuilder`.
+    private final LooseObjectReference<Blob> blob;
 
-    public File(boolean executable, String name, LooseObjectReference<Blob> blobReference) {
+    public File(boolean executable, String name, LooseObjectReference<Blob> blob) {
         this.executable = executable;
         this.name = name;
-        this.blobReference = blobReference;
+        this.blob = blob;
     }
 
     @Override
@@ -27,6 +29,6 @@ public final class File implements TreeNode {
 
     @Override
     public byte[] getTargetHash() {
-        return blobReference.getTargetHash();
+        return blob.getTargetHash();
     }
 }
