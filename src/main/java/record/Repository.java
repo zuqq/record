@@ -2,6 +2,7 @@ package record;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.ZonedDateTime;
@@ -120,10 +121,9 @@ public final class Repository {
             if (!Files.isHidden(file)) {
                 TreeNode node;
                 if (Files.isSymbolicLink(file)) {
-                    node = new SymbolicLink(
-                        file.getFileName().toString(),
-                        Files.readSymbolicLink(file)
-                    );
+                    Blob blob = new Blob(Files.readSymbolicLink(file).toString().getBytes(StandardCharsets.UTF_8));
+                    writeObject(blob);
+                    node = new SymbolicLink(file.getFileName().toString(), new LooseObjectReference<>(blob));
                 } else {
                     Blob blob = new Blob(Files.readAllBytes(file));
                     writeObject(blob);
