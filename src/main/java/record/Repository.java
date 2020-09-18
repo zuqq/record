@@ -152,7 +152,6 @@ public final class Repository {
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
         Commit commit = new Commit(readTree(), parents, user, timestamp, user, timestamp, message);
         writeObject(commit);
-        LooseObjectReference<Commit> commitReference = new LooseObjectReference<>(commit);
-        writeReference(head, new ReferenceContent(commitReference.toString()));
+        writeReference(head, new ReferenceContent(commit));
     }
 }

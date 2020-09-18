@@ -17,6 +17,11 @@ public final class ReferenceContent {
         target = symbolic ? content.substring(5) : content;
     }
 
+    public ReferenceContent(Commit commit) {
+        symbolic = false;
+        target = new LooseObjectReference<>(commit).toString();
+    }
+
     public ReferenceContent(boolean symbolic, String target) {
         this.symbolic = symbolic;
         this.target = target;
