@@ -127,11 +127,9 @@ public final class Repository {
                 } else {
                     Blob blob = new Blob(Files.readAllBytes(file));
                     writeObject(blob);
-                    node = new File(
-                        Files.isExecutable(file),
-                        file.getFileName().toString(),
-                        new LooseObjectReference<>(blob)
-                    );
+                    String name = file.getFileName().toString();
+                    LooseObjectReference<Blob> reference = new LooseObjectReference<>(blob);
+                    node = Files.isExecutable(file) ? new Executable(name, reference) : new File(name, reference);
                 }
                 store.put(file, node);
             }

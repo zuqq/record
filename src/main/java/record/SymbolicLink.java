@@ -13,8 +13,8 @@ public final class SymbolicLink implements TreeNode {
     }
 
     @Override
-    public String getMode() {
-        return "120000";
+    public Mode getMode() {
+        return Mode.SYMBOLIC_LINK;
     }
 
     @Override

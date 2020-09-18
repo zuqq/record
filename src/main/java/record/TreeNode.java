@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
  * A node in a {@link Tree}.
  */
 public interface TreeNode {
-    String getMode();
+    Mode getMode();
 
     String getName();
 

@@ -1,19 +1,17 @@
 package record;
 
-public final class File implements TreeNode {
+public class Executable implements TreeNode {
     private final String name;
-    // This uses a `LooseObjectReference` instead of just storing the hash
-    // because that gives me greater type safety in `Repository::TreeBuilder`.
     private final LooseObjectReference<Blob> blob;
 
-    public File(String name, LooseObjectReference<Blob> blob) {
+    public Executable(String name, LooseObjectReference<Blob> blob) {
         this.name = name;
         this.blob = blob;
     }
 
     @Override
     public Mode getMode() {
-        return Mode.FILE;
+        return Mode.EXECUTABLE;
     }
 
     @Override
