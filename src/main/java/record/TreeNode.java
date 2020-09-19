@@ -22,4 +22,6 @@ public interface TreeNode {
         System.arraycopy(hash, 0, result, part.length, hash.length);
         return result;
     }
+
+    <E extends Exception> void accept(TreeVisitor<E> visitor) throws E;
 }

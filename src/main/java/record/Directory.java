@@ -23,4 +23,9 @@ public final class Directory implements TreeNode {
     public byte[] getTargetHash() {
         return tree;
     }
+
+    @Override
+    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
+        visitor.visit(this);
+    }
 }

@@ -76,4 +76,10 @@ public final class Tree implements LooseObject {
         }
         return result;
     }
+
+    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
+        for (TreeNode child : children) {
+            child.accept(visitor);
+        }
+    }
 }

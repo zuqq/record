@@ -1,16 +1,16 @@
 package record;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 public final class Repository {
     private final Path folder;
@@ -56,6 +56,18 @@ public final class Repository {
             Files.createDirectories(git.resolve("refs/tags"));
             writeReference("HEAD", new ReferenceContent(true, "refs/heads/master"));
         }
+    }
+
+    private byte[] readObject(String encodedHash) throws IOException {
+        Path bucket = git.resolve("objects").resolve(encodedHash.substring(0, 2));
+        try (InputStream file = Files.newInputStream(bucket.resolve(encodedHash.substring(2)));
+             InflaterInputStream stream = new InflaterInputStream(file)) {
+            return stream.readAllBytes();
+        }
+    }
+
+    private byte[] readObject(byte[] hash) throws IOException {
+        return readObject(Base16.encode(hash));
     }
 
     private void writeObject(LooseObject object) throws IOException {
@@ -119,18 +131,18 @@ public final class Repository {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             if (!Files.isHidden(file)) {
+                Blob blob;
                 TreeNode node;
                 if (Files.isSymbolicLink(file)) {
-                    Blob blob = new Blob(Files.readSymbolicLink(file).toString().getBytes(StandardCharsets.UTF_8));
-                    writeObject(blob);
+                    blob = new Blob(Files.readSymbolicLink(file).toString().getBytes(StandardCharsets.UTF_8));
                     node = new SymbolicLink(file.getFileName().toString(), blob.getHash());
                 } else {
-                    Blob blob = new Blob(Files.readAllBytes(file));
-                    writeObject(blob);
+                    blob = new Blob(Files.readAllBytes(file));
                     String name = file.getFileName().toString();
                     byte[] blobHash = blob.getHash();
                     node = Files.isExecutable(file) ? new Executable(name, blobHash) : new File(name, blobHash);
                 }
+                writeObject(blob);
                 store.put(file, node);
             }
             return FileVisitResult.CONTINUE;
@@ -153,5 +165,79 @@ public final class Repository {
         Commit commit = new Commit(readTree(), parents, user, timestamp, user, timestamp, message);
         writeObject(commit);
         writeReference(head, new ReferenceContent(commit));
+    }
+
+    private class TreeWriter implements TreeVisitor<IOException> {
+        private Path folder;
+
+        public TreeWriter(Path folder) {
+            this.folder = folder;
+        }
+
+        @Override
+        public void visit(Directory node) throws IOException {
+            folder = folder.resolve(node.getName());
+            Tree.parse(readObject(node.getTargetHash())).accept(this);
+            folder = folder.getParent();
+        }
+
+        @Override
+        public void visit(Executable node) throws IOException {
+            Path path = folder.resolve(node.getName());
+            Files.write(path, Blob.parse(readObject(node.getTargetHash())).getBody());
+            Files.setPosixFilePermissions(path,
+                    Set.of(PosixFilePermission.OWNER_EXECUTE,
+                           PosixFilePermission.GROUP_EXECUTE,
+                           PosixFilePermission.OTHERS_EXECUTE));
+        }
+
+        @Override
+        public void visit(File node) throws IOException {
+            Files.write(folder.resolve(node.getName()),
+                        Blob.parse(readObject(node.getTargetHash())).getBody());
+        }
+
+        @Override
+        public void visit(SymbolicLink node) throws IOException {
+            Files.createSymbolicLink(folder.resolve(node.getName()),
+                    Path.of(new String(Blob.parse(readObject(node.getTargetHash())).getBody(),
+                                       StandardCharsets.UTF_8)));
+        }
+    }
+
+    private void writeTree(Tree tree) throws IOException {
+        tree.accept(new TreeWriter(folder));
+    }
+
+    private static class Deleter extends SimpleFileVisitor<Path> {
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            return Files.isHidden(dir) ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+                if (!stream.iterator().hasNext()) {
+                    Files.delete(dir);
+                }
+            }
+            return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            if (!Files.isHidden(file)) {
+                Files.delete(file);
+            }
+            return FileVisitResult.CONTINUE;
+        }
+    }
+
+    public void checkout(String encodedCommitHash) throws IOException {
+        byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));
+        Files.walkFileTree(folder, new Deleter());
+        writeTree(Tree.parse(readObject(treeHash)));
+        writeReference("HEAD", new ReferenceContent(encodedCommitHash));
     }
 }
