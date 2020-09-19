@@ -11,7 +11,7 @@ public final class Directory implements TreeNode {
 
     @Override
     public String getMode() {
-        return "040000";
+        return "40000";
     }
 
     @Override
