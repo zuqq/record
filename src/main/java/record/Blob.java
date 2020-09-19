@@ -16,17 +16,14 @@ public final class Blob implements LooseObject {
     }
 
     public static Blob parse(byte[] input) throws FatalParseException {
-        int i = 0;
-        for (; i < input.length; ++i) {
-            if (input[i] == 0) {
-                break;
-            }
-        }
+        int i = FirstZero.in(input);
         String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
         if (!header.startsWith("blob ")) {
             throw new FatalParseException("Malformed header.");
         }
-        byte[] data = Arrays.copyOfRange(input, i + 1, input.length);
+        // Move `i` to the start of the body.
+        ++i;
+        byte[] data = Arrays.copyOfRange(input, i, input.length);
         if (Integer.parseInt(header.substring(5)) != data.length) {
             throw new FatalParseException("Header contains incorrect length.");
         }
