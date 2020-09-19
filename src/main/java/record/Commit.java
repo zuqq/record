@@ -7,16 +7,16 @@ import java.util.List;
  * A git commit object.
  */
 public final class Commit implements LooseObject {
-    private final LooseObjectReference<Tree> tree;
-    private final List<LooseObjectReference<Commit>> parents;
+    private final String tree;
+    private final List<String> parents;
     private final User author;
     private final Timestamp authorDate;
     private final User committer;
     private final Timestamp committerDate;
     private final String message;
 
-    public Commit(LooseObjectReference<Tree> tree,
-                  List<LooseObjectReference<Commit>> parents,
+    public Commit(String tree,
+                  List<String> parents,
                   User author,
                   Timestamp authorDate,
                   User committer,
@@ -39,13 +39,14 @@ public final class Commit implements LooseObject {
     @Override
     public byte[] getBody() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
-        StringBuilder builder = new StringBuilder(String.format("tree %s\n", tree));
-        for (LooseObjectReference<Commit> parent : parents) {
-            builder.append(String.format("parent %s\n", parent));
+        StringBuilder builder = new StringBuilder();
+        builder.append("tree ").append(tree).append('\n');
+        for (String parent : parents) {
+            builder.append("parent ").append(parent).append('\n');
         }
         builder
-                .append(String.format("author %s %s\n", author, authorDate))
-                .append(String.format("committer %s %s\n", committer, committerDate))
+                .append("author ").append(author).append(' ').append(authorDate).append('\n')
+                .append("committer ").append(committer).append(' ').append(committerDate).append('\n')
                 .append('\n')
                 .append(message).append('\n');
         return builder.toString().getBytes(StandardCharsets.UTF_8);

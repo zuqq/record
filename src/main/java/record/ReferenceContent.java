@@ -19,7 +19,7 @@ public final class ReferenceContent {
 
     public ReferenceContent(Commit commit) {
         symbolic = false;
-        target = new LooseObjectReference<>(commit).toString();
+        target = Base16.encode(commit.getHash());
     }
 
     public ReferenceContent(boolean symbolic, String target) {

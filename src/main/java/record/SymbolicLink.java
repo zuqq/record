@@ -5,16 +5,16 @@ import java.nio.file.Path;
 
 public final class SymbolicLink implements TreeNode {
     private final String name;
-    private final LooseObjectReference<Blob> blob;
+    private final byte[] blob;
 
-    public SymbolicLink(String name, LooseObjectReference<Blob> blob) {
+    public SymbolicLink(String name, byte[] blob) {
         this.name = name;
         this.blob = blob;
     }
 
     @Override
-    public Mode getMode() {
-        return Mode.SYMBOLIC_LINK;
+    public String getMode() {
+        return "120000";
     }
 
     @Override
@@ -24,6 +24,6 @@ public final class SymbolicLink implements TreeNode {
 
     @Override
     public byte[] getTargetHash() {
-        return blob.getTargetHash();
+        return blob;
     }
 }

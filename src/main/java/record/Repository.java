@@ -73,13 +73,13 @@ public final class Repository {
     private class TreeBuilder extends SimpleFileVisitor<Path> {
         private final Path target;
         private final Map<Path, TreeNode> store = new HashMap<>();
-        private LooseObjectReference<Tree> result = null;
+        private String result = null;
 
         public TreeBuilder(Path target) {
             this.target = target;
         }
 
-        public LooseObjectReference<Tree> getResult() {
+        public String getResult() {
             return result;
         }
 
@@ -108,10 +108,10 @@ public final class Repository {
             }
             Tree tree = new Tree(children);
             writeObject(tree);
-            LooseObjectReference<Tree> treeReference = new LooseObjectReference<>(tree);
-            store.put(dir, new Directory(dir.getFileName().toString(), treeReference));
+            byte[] treeHash = tree.getHash();
+            store.put(dir, new Directory(dir.getFileName().toString(), treeHash));
             if (dir.equals(target)) {
-                result = treeReference;
+                result = Base16.encode(treeHash);
             }
             return FileVisitResult.CONTINUE;
         }
@@ -123,13 +123,13 @@ public final class Repository {
                 if (Files.isSymbolicLink(file)) {
                     Blob blob = new Blob(Files.readSymbolicLink(file).toString().getBytes(StandardCharsets.UTF_8));
                     writeObject(blob);
-                    node = new SymbolicLink(file.getFileName().toString(), new LooseObjectReference<>(blob));
+                    node = new SymbolicLink(file.getFileName().toString(), blob.getHash());
                 } else {
                     Blob blob = new Blob(Files.readAllBytes(file));
                     writeObject(blob);
                     String name = file.getFileName().toString();
-                    LooseObjectReference<Blob> reference = new LooseObjectReference<>(blob);
-                    node = Files.isExecutable(file) ? new Executable(name, reference) : new File(name, reference);
+                    byte[] blobHash = blob.getHash();
+                    node = Files.isExecutable(file) ? new Executable(name, blobHash) : new File(name, blobHash);
                 }
                 store.put(file, node);
             }
@@ -137,7 +137,7 @@ public final class Repository {
         }
     }
 
-    private LooseObjectReference<Tree> readTree() throws IOException {
+    private String readTree() throws IOException {
         TreeBuilder visitor = new TreeBuilder(folder);
         Files.walkFileTree(folder, visitor);
         return visitor.getResult();
@@ -145,9 +145,9 @@ public final class Repository {
 
     public void commit(User user, String message) throws IOException {
         String head = resolveReference("HEAD");
-        List<LooseObjectReference<Commit>> parents = new ArrayList<>();
+        List<String> parents = new ArrayList<>();
         if (Files.exists(git.resolve(head))) {
-            parents.add(new LooseObjectReference<>(readReference(head).getTarget()));
+            parents.add(readReference(head).getTarget());
         }
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
         Commit commit = new Commit(readTree(), parents, user, timestamp, user, timestamp, message);

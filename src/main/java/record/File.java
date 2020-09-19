@@ -4,16 +4,16 @@ public final class File implements TreeNode {
     private final String name;
     // This uses a `LooseObjectReference` instead of just storing the hash
     // because that gives me greater type safety in `Repository::TreeBuilder`.
-    private final LooseObjectReference<Blob> blob;
+    private final byte[] blob;
 
-    public File(String name, LooseObjectReference<Blob> blob) {
+    public File(String name, byte[] blob) {
         this.name = name;
         this.blob = blob;
     }
 
     @Override
-    public Mode getMode() {
-        return Mode.FILE;
+    public String getMode() {
+        return "100644";
     }
 
     @Override
@@ -23,6 +23,6 @@ public final class File implements TreeNode {
 
     @Override
     public byte[] getTargetHash() {
-        return blob.getTargetHash();
+        return blob;
     }
 }
