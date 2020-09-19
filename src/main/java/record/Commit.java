@@ -31,6 +31,30 @@ public final class Commit implements LooseObject {
         this.message = message;
     }
 
+    public static byte[] extractTreeHash(byte[] input) throws FatalParseException {
+        int i = FirstZero.in(input);
+        String header = new String(input, 0, i, StandardCharsets.UTF_8);
+        if (!header.startsWith("commit ")) {
+            throw new FatalParseException("Malformed header.");
+        }
+        // Move `i` to the start of the body.
+        ++i;
+        if (Integer.parseInt(header.substring(7)) != input.length - i) {
+            throw new FatalParseException("Header contains incorrect length.");
+        }
+        // Skip past "tree ".
+        i += 5;
+        for (int j = i; j < input.length; ++j) {
+            if (input[j] == '\n') {
+                if (j - i != 40) {
+                    throw new FatalParseException("Invalid tree hash.");
+                }
+                return Base16.decode(new String(input, i, j - i, StandardCharsets.UTF_8));
+            }
+        }
+        throw new FatalParseException("Malformed body.");
+    }
+
     @Override
     public String getTag() {
         return "commit";
