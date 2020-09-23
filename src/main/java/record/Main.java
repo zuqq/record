@@ -5,9 +5,10 @@ import java.nio.file.Paths;
 
 public class Main {
     private static void usage() {
-        System.err.println("Usage:");
+        System.err.print("Usage:");
         System.err.println("\trecord init");
         System.err.println("\trecord commit NAME E-MAIL MESSAGE");
+        System.err.println("\trecord checkout COMMIT");
         System.exit(-1);
     }
 
@@ -17,6 +18,8 @@ public class Main {
             repository.init();
         } else if (args.length == 4 && args[0].equals("commit")) {
             repository.commit(new User(args[1], args[2]), args[3]);
+        } else if (args.length == 2 && args[0].equals("checkout")) {
+            repository.checkout(args[1]);
         } else {
             usage();
         }
