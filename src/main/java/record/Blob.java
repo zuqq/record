@@ -21,7 +21,7 @@ public final class Blob implements LooseObject {
         if (!header.startsWith("blob ")) {
             throw new FatalParseException("Malformed header.");
         }
-        // Move `i` to the start of the body.
+        // Move to the start of the body.
         ++i;
         byte[] data = Arrays.copyOfRange(input, i, input.length);
         if (Integer.parseInt(header.substring(5)) != data.length) {

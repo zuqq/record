@@ -37,7 +37,7 @@ public final class Commit implements LooseObject {
         if (!header.startsWith("commit ")) {
             throw new FatalParseException("Malformed header.");
         }
-        // Move `i` to the start of the body.
+        // Move to the start of the body.
         ++i;
         if (Integer.parseInt(header.substring(7)) != input.length - i) {
             throw new FatalParseException("Header contains incorrect length.");
@@ -63,16 +63,16 @@ public final class Commit implements LooseObject {
     @Override
     public byte[] getBody() {
         // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
-        StringBuilder builder = new StringBuilder();
-        builder.append("tree ").append(tree).append('\n');
+        StringBuilder bodyBuilder = new StringBuilder();
+        bodyBuilder.append("tree ").append(tree).append('\n');
         for (String parent : parents) {
-            builder.append("parent ").append(parent).append('\n');
+            bodyBuilder.append("parent ").append(parent).append('\n');
         }
-        builder
+        bodyBuilder
                 .append("author ").append(author).append(' ').append(authorDate).append('\n')
                 .append("committer ").append(committer).append(' ').append(committerDate).append('\n')
                 .append('\n')
                 .append(message).append('\n');
-        return builder.toString().getBytes(StandardCharsets.UTF_8);
+        return bodyBuilder.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

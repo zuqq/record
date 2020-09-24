@@ -27,7 +27,7 @@ public final class Tree implements LooseObject {
         if (!header.startsWith("tree ")) {
             throw new FatalParseException("Malformed header.");
         }
-        // Move `i` to the start of the body.
+        // Move to the start of the body.
         ++i;
         if (Integer.parseInt(header.substring(5)) != input.length - i) {
             throw new FatalParseException("Header contains incorrect length.");
@@ -35,11 +35,11 @@ public final class Tree implements LooseObject {
         List<TreeNode> children = new ArrayList<>();
         while (i < input.length) {
             int j = FirstZero.in(input, i);
-            // It's `j - i` instead of `j - i + 1` because zero doesn't belong.
+            // It's j - i instead of j - i + 1 because we need to exclude '\0' itself.
             String prefix = new String(input, i, j - i, StandardCharsets.UTF_8);
             int spaceIndex = prefix.indexOf(' ');
             String name = prefix.substring(spaceIndex + 1);
-            // Move `i` to the start of the next entry.
+            // Skip past '\0' and the SHA-1 digest.
             i = j + 21;
             byte[] hash = Arrays.copyOfRange(input, j + 1, i);
             TreeNode child = switch (prefix.substring(0, spaceIndex)) {

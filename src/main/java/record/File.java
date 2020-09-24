@@ -2,8 +2,6 @@ package record;
 
 public final class File implements TreeNode {
     private final String name;
-    // This uses a `LooseObjectReference` instead of just storing the hash
-    // because that gives me greater type safety in `Repository::TreeBuilder`.
     private final byte[] blob;
 
     public File(String name, byte[] blob) {
