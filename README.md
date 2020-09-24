@@ -1,5 +1,7 @@
 # record
 
+[![Build Status](https://travis-ci.com/zuqq/record.svg?branch=master)](https://travis-ci.com/zuqq/record)
+
 An implementation of the git object model.
 
 ## Usage
