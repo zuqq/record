@@ -62,7 +62,6 @@ public final class Commit implements LooseObject {
 
     @Override
     public byte[] getBody() {
-        // Unlike trees, commits use Base16-encoded hashes of the objects they refer to.
         StringBuilder bodyBuilder = new StringBuilder();
         bodyBuilder.append("tree ").append(tree).append('\n');
         for (String parent : parents) {

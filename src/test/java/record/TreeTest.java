@@ -8,8 +8,8 @@ import java.util.Arrays;
 public class TreeTest {
     private static final Tree tree = new Tree(
         Arrays.asList(
-            new File("a", Base16.decode("78981922613b2afb6025042ff6bd878ac1994e85")),
-            new File("b", Base16.decode("61780798228d17af2d34fce4cfbdf35556832472"))
+            new File("a", false, Base16.decode("78981922613b2afb6025042ff6bd878ac1994e85")),
+            new File("b", false, Base16.decode("61780798228d17af2d34fce4cfbdf35556832472"))
         )
     );
 

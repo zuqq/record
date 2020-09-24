@@ -185,7 +185,7 @@ public final class Repository {
                     blob = new Blob(Files.readAllBytes(file));
                     String name = file.getFileName().toString();
                     byte[] blobHash = blob.getHash();
-                    node = Files.isExecutable(file) ? new Executable(name, blobHash) : new File(name, blobHash);
+                    node = new File(name, Files.isExecutable(file), blobHash);
                 }
                 writeObject(blob);
                 store.put(file, node);
@@ -241,19 +241,15 @@ public final class Repository {
         }
 
         @Override
-        public void visit(Executable node) throws IOException {
+        public void visit(File node) throws IOException {
             Path path = currentDirectory.resolve(node.getName());
             Files.write(path, Blob.parse(readObject(node.getTargetHash())).getBody());
-            Files.setPosixFilePermissions(path,
-                    Set.of(PosixFilePermission.OWNER_EXECUTE,
-                           PosixFilePermission.GROUP_EXECUTE,
-                           PosixFilePermission.OTHERS_EXECUTE));
-        }
-
-        @Override
-        public void visit(File node) throws IOException {
-            Files.write(currentDirectory.resolve(node.getName()),
-                        Blob.parse(readObject(node.getTargetHash())).getBody());
+            if (node.isExecutable()) {
+                Files.setPosixFilePermissions(path,
+                        Set.of(PosixFilePermission.OWNER_EXECUTE,
+                                PosixFilePermission.GROUP_EXECUTE,
+                                PosixFilePermission.OTHERS_EXECUTE));
+            }
         }
 
         @Override

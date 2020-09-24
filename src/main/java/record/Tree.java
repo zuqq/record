@@ -42,12 +42,17 @@ public final class Tree implements LooseObject {
             // Skip past '\0' and the SHA-1 digest.
             i = j + 21;
             byte[] hash = Arrays.copyOfRange(input, j + 1, i);
-            TreeNode child = switch (prefix.substring(0, spaceIndex)) {
-                case "40000"  -> new Directory(name, hash);
-                case "100755" -> new Executable(name, hash);
-                case "100644" -> new File(name, hash);
-                case "120000" -> new SymbolicLink(name, hash);
-                default       -> throw new FatalParseException("Illegal mode.");
+            int type = Integer.parseInt(prefix.substring(0, spaceIndex - 4), 8);
+            int mode = Integer.parseInt(prefix.substring(spaceIndex - 3, spaceIndex), 8);
+            TreeNode child = switch (type) {
+                case 004 -> new Directory(name, hash);
+                case 010 -> switch (mode) {
+                    case 0755 -> new File(name, true, hash);
+                    case 0644 -> new File(name, false, hash);
+                    default   -> throw new FatalParseException("Illegal file mode.");
+                };
+                case 012 -> new SymbolicLink(name, hash);
+                default  -> throw new FatalParseException("Illegal file type.");
             };
             children.add(child);
         }

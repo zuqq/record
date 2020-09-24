@@ -2,16 +2,22 @@ package record;
 
 public final class File implements TreeNode {
     private final String name;
+    private final boolean executable;
     private final byte[] blob;
 
-    public File(String name, byte[] blob) {
+    public File(String name, boolean executable, byte[] blob) {
         this.name = name;
+        this.executable = executable;
         this.blob = blob;
     }
 
+    public boolean isExecutable() {
+        return executable;
+    }
+
     @Override
-    public String getMode() {
-        return "100644";
+    public int getMode() {
+        return executable ? 0100755 : 0100644;
     }
 
     @Override
