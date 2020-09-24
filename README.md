@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.com/zuqq/record.svg?branch=master)](https://travis-ci.com/zuqq/record)
 
-An implementation of the git object model.
+An implementation of the git object model. As it uses POSIX file permissions,
+it's unlikely to work on Windows.
 
 ## Usage
 

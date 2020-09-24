@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.zip.DeflaterOutputStream;
@@ -121,9 +121,13 @@ public final class Repository {
         if (!Files.exists(bucket)) {
             Files.createDirectory(bucket);
         }
-        try (OutputStream file = Files.newOutputStream(bucket.resolve(encodedHash.substring(2)));
-             DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
-            stream.write(object.getBytes());
+        Path path = bucket.resolve(encodedHash.substring(2));
+        if (!Files.exists(path)) {
+            try (OutputStream file = Files.newOutputStream(path);
+                 DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
+                stream.write(object.getBytes());
+            }
+            Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("r--r--r--"));
         }
     }
 
@@ -244,12 +248,8 @@ public final class Repository {
         public void visit(File node) throws IOException {
             Path path = currentDirectory.resolve(node.getName());
             Files.write(path, Blob.parse(readObject(node.getTargetHash())).getBody());
-            if (node.isExecutable()) {
-                Files.setPosixFilePermissions(path,
-                        Set.of(PosixFilePermission.OWNER_EXECUTE,
-                                PosixFilePermission.GROUP_EXECUTE,
-                                PosixFilePermission.OTHERS_EXECUTE));
-            }
+            Files.setPosixFilePermissions(path,
+                    PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
         }
 
         @Override
