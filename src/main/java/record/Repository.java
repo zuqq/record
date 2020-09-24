@@ -155,14 +155,14 @@ public final class Repository {
         return visitor.getResult();
     }
 
-    public void commit(User user, String message) throws IOException {
+    public void commit(User committer, String message) throws IOException {
         String head = resolveReference("HEAD");
         List<String> parents = new ArrayList<>();
         if (Files.exists(git.resolve(head))) {
             parents.add(readReference(head).getTarget());
         }
         Timestamp timestamp = new Timestamp(ZonedDateTime.now());
-        Commit commit = new Commit(readTree(), parents, user, timestamp, user, timestamp, message);
+        Commit commit = new Commit(readTree(), parents, committer, timestamp, committer, timestamp, message);
         writeObject(commit);
         writeReference(head, new ReferenceContent(commit));
     }
