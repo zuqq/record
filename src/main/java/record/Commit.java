@@ -5,6 +5,9 @@ import java.util.List;
 
 /**
  * A git commit object.
+ *
+ * Commits are textual objects; unlike trees, they use Base-16 encoded hashes of the objects
+ * they refer to.
  */
 public final class Commit implements LooseObject {
     private final String tree;
@@ -15,6 +18,15 @@ public final class Commit implements LooseObject {
     private final Timestamp committerDate;
     private final String message;
 
+    /**
+     * @param tree The Base16-encoded hash of the tree.
+     * @param parents A list of the Base16-encoded hashes of the parents.
+     * @param author Who created the content.
+     * @param authorDate When the content was created.
+     * @param committer Who is creating the commit.
+     * @param committerDate When the commit was created.
+     * @param message The commit message.
+     */
     public Commit(String tree,
                   List<String> parents,
                   User author,
@@ -31,6 +43,13 @@ public final class Commit implements LooseObject {
         this.message = message;
     }
 
+    /**
+     * Extract the tree hash from a commit's content.
+     *
+     * @param input A byte array containing the commit's content.
+     * @return The hash of the commit's tree.
+     * @throws FatalParseException If {@code input} is not a valid commit.
+     */
     public static byte[] extractTreeHash(byte[] input) throws FatalParseException {
         int i = FirstZero.in(input);
         String header = new String(input, 0, i, StandardCharsets.UTF_8);
@@ -56,7 +75,7 @@ public final class Commit implements LooseObject {
     }
 
     @Override
-    public String getTag() {
+    public String getType() {
         return "commit";
     }
 

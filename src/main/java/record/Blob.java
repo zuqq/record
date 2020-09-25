@@ -4,17 +4,27 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * A git blob object.
- *
- * Blobs are (anonymous) snapshots of files.
+ * A git blob object, i.e., a snapshot of a file.
  */
 public final class Blob implements LooseObject {
     private final byte[] data;
 
+    /**
+     * Construct a blob from a file's data.
+     *
+     * @param data The file's data.
+     */
     public Blob(byte[] data) {
         this.data = data;
     }
 
+    /**
+     * Reconstruct a blob from its content.
+     *
+     * @param input The blob's content.
+     * @return The corresponding {@link Blob}.
+     * @throws FatalParseException If {@code input} is not a valid blob.
+     */
     public static Blob parse(byte[] input) throws FatalParseException {
         int i = FirstZero.in(input);
         String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
@@ -31,7 +41,7 @@ public final class Blob implements LooseObject {
     }
 
     @Override
-    public String getTag() {
+    public String getType() {
         return "blob";
     }
 

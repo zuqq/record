@@ -10,6 +10,9 @@ public final class Base16 {
 
     /**
      * Convert bytes into Base16.
+     *
+     * @param data An array of bytes.
+     * @return The corresponding string of hexadecimal digits.
      */
     public static String encode(byte[] data) {
         char[] result = new char[2 * data.length];
@@ -22,6 +25,10 @@ public final class Base16 {
 
     /**
      * Convert Base16 into bytes.
+     *
+     * @param string A string consisting of pairs of hexadecimal digits.
+     * @return The corresponding array of bytes.
+     * @throws FatalParseException If the input is malformed.
      */
     public static byte[] decode(String string) throws FatalParseException {
         if (string.length() % 2 != 0) {

@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -77,6 +83,8 @@ public final class Repository {
 
     /**
      * Initialize the .git subdirectory.
+     *
+     * @throws IOException If one of the required directories and files could not be created.
      */
     public void init() throws IOException {
         if (!Files.exists(git)) {
@@ -90,8 +98,9 @@ public final class Repository {
     /**
      * Reads a {@link LooseObject} from the object store.
      *
-     * The given {@code encodedHash} is the Base16-encoded SHA-digest of the
-     * desired {@link LooseObject}.
+     * Note that this returns the inflated (i.e., decompressed) content.
+     *
+     * The given {@code encodedHash} is the object's Base16-encoded hash.
      */
     private byte[] readObject(String encodedHash) throws IOException {
         Path bucket = git.resolve("objects").resolve(encodedHash.substring(0, 2));
@@ -104,8 +113,9 @@ public final class Repository {
     /**
      * Reads a {@link LooseObject} from the object store.
      *
-     * The given {@code encodedHash} is the SHA-digest of the desired
-     * {@link LooseObject}.
+     * Note that this returns the inflated (i.e., decompressed) content.
+     *
+     * The given {@code encodedHash} is the object's hash.
      */
     private byte[] readObject(byte[] hash) throws IOException {
         return readObject(Base16.encode(hash));
@@ -114,6 +124,8 @@ public final class Repository {
 
     /**
      * Writes a {@link LooseObject} to the object store.
+     *
+     * Note that this deflates (i.e., compresses) the content.
      */
     private void writeObject(LooseObject object) throws IOException {
         String encodedHash = Base16.encode(object.getHash());
@@ -187,9 +199,7 @@ public final class Repository {
                     node = new SymbolicLink(file.getFileName().toString(), blob.getHash());
                 } else {
                     blob = new Blob(Files.readAllBytes(file));
-                    String name = file.getFileName().toString();
-                    byte[] blobHash = blob.getHash();
-                    node = new File(name, Files.isExecutable(file), blobHash);
+                    node = new File(file.getFileName().toString(), Files.isExecutable(file), blob.getHash());
                 }
                 writeObject(blob);
                 store.put(file, node);
@@ -201,9 +211,10 @@ public final class Repository {
     /**
      * Takes a snapshot of the working directory.
      *
-     * Writes the resulting git objects directly to the file system; returns
-     * the SHA-1 digest of the {@link Tree} corresponding to the current state
-     * of the working directory.
+     * Note that this writes the resulting git objects to the file system.
+     *
+     * Returns the Base-16 encoded hash of the {@link Tree} corresponding to
+     * the current state of the working directory.
      */
     private String buildTree() throws IOException {
         TreeBuilder visitor = new TreeBuilder(directory);
@@ -217,6 +228,10 @@ public final class Repository {
      * Creates a new commit object reflecting the current state of the working
      * directory, writes the commit object to the object store, and then
      * advances the HEAD.
+     *
+     * @param committer Who is creating the commit.
+     * @param message The commit message.
+     * @throws IOException If one of the steps failed.
      */
     public void commit(User committer, String message) throws IOException {
         String head = resolveReference("HEAD");
@@ -224,7 +239,7 @@ public final class Repository {
         if (Files.exists(git.resolve(head))) {
             parents.add(readReference(head).getTarget());
         }
-        Timestamp timestamp = new Timestamp(ZonedDateTime.now());
+        Timestamp timestamp = Timestamp.now();
         Commit commit = new Commit(buildTree(), parents, committer, timestamp, committer, timestamp, message);
         writeObject(commit);
         writeReference(head, new ReferenceContent(commit));
@@ -261,7 +276,7 @@ public final class Repository {
     }
 
     /**
-     * Write the content of {@code tree} to the working directory.
+     * Replaces the working directory by the state of {@code tree}.
      */
     private void thawTree(Tree tree) throws IOException {
         tree.accept(new TreeRestorer());
@@ -293,10 +308,13 @@ public final class Repository {
     }
 
     /**
-     * Restores the working directory to {@code encodedCommitHash}.
+     * Restores the working directory to the state of {@code encodedCommitHash}.
      *
      * Note this is a destructive operation: it discards the current state of
      * the working directory.
+     *
+     * @param encodedCommitHash The Base16-encoded hash of the commit to check out.
+     * @throws IOException If the checkout failed.
      */
     public void checkout(String encodedCommitHash) throws IOException {
         byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));

@@ -18,6 +18,10 @@ public final class Timestamp {
         this.timestamp = timestamp;
     }
 
+    public static Timestamp now() {
+        return new Timestamp(ZonedDateTime.now());
+    }
+
     public static Timestamp of(String input) {
         return new Timestamp(ZonedDateTime.parse(input, formatter));
     }

@@ -7,11 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * A git tree object.
+ * A git tree object, i.e., a snapshot of a directory.
  *
- * Trees are (anonymous) snapshots of directories. Because a directory's
- * children have names, we can't use {@link Blob} and {@link Tree} as
- * tree nodes. Instead, there is a separate interface {@link TreeNode}.
+ * A tree consists of a list of {@link TreeNode}s that represent the directory's entries.
  */
 public final class Tree implements LooseObject {
     private final List<TreeNode> children;
@@ -21,7 +19,14 @@ public final class Tree implements LooseObject {
         this.children = children;
     }
 
-    public static Tree parse(byte[] input) {
+    /**
+     * Reconstruct a tree from its content.
+     *
+     * @param input A byte array containing the tree's content.
+     * @return The corresponding {@link Tree}.
+     * @throws FatalParseException If {@code input} is not a valid tree.
+     */
+    public static Tree parse(byte[] input) throws FatalParseException {
         int i = FirstZero.in(input);
         String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
         if (!header.startsWith("tree ")) {
@@ -43,13 +48,13 @@ public final class Tree implements LooseObject {
             i = j + 21;
             byte[] hash = Arrays.copyOfRange(input, j + 1, i);
             int type = Integer.parseInt(prefix.substring(0, spaceIndex - 4), 8);
-            int mode = Integer.parseInt(prefix.substring(spaceIndex - 3, spaceIndex), 8);
+            int permissions = Integer.parseInt(prefix.substring(spaceIndex - 3, spaceIndex), 8);
             TreeNode child = switch (type) {
                 case 004 -> new Directory(name, hash);
-                case 010 -> switch (mode) {
+                case 010 -> switch (permissions) {
                     case 0755 -> new File(name, true, hash);
                     case 0644 -> new File(name, false, hash);
-                    default   -> throw new FatalParseException("Illegal file mode.");
+                    default   -> throw new FatalParseException("Illegal file permissions.");
                 };
                 case 012 -> new SymbolicLink(name, hash);
                 default  -> throw new FatalParseException("Illegal file type.");
@@ -60,7 +65,7 @@ public final class Tree implements LooseObject {
     }
 
     @Override
-    public String getTag() {
+    public String getType() {
         return "tree";
     }
 

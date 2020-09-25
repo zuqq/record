@@ -5,20 +5,43 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Loose (i.e., non-packfile) git objects.
+ * Loose git objects.
+ *
+ * The content of a loose git object is of the form
+ *
+ * <pre>{@code
+ *     +------+----+-------------+-----+------+
+ *     | type | SP | body length | NUL | body |
+ *     +------+----+-------------+-----+------+
+ * }</pre>
+ *
+ * where {@code type} is a string representing the object's type (e.g., {@code "blob"})
+ * and {@code body length} is the decimal representation of {@code body}'s length.
  */
 public interface LooseObject {
-    String getTag();
+    /**
+     * Get the object's type.
+     *
+     * @return A string representing the object's type.
+     */
+    String getType();
 
+    /**
+     * Get the body of the object's content.
+     *
+     * @return A byte array containing the body of the object's content.
+     */
     byte[] getBody();
 
     /**
-     * Returns the object's uncompressed content.
+     * Get the object's uncompressed content.
+     *
+     * @return A byte array containing the object's content.
      */
     default byte[] getBytes() {
         byte[] body = getBody();
         byte[] header = String
-                .format("%s %d\0", getTag(), body.length)
+                .format("%s %d\0", getType(), body.length)
                 .getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[header.length + body.length];
         System.arraycopy(header, 0, result, 0, header.length);
@@ -27,7 +50,9 @@ public interface LooseObject {
     }
 
     /**
-     * Returns the object's SHA-1 digest ("hash").
+     * Get the object's hash.
+     *
+     * @return A byte array containing the SHA-1 digest of the object's content.
      */
     default byte[] getHash() {
         MessageDigest md;

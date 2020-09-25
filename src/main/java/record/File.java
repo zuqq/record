@@ -1,5 +1,8 @@
 package record;
 
+/**
+ * A tree node representing a file.
+ */
 public final class File implements TreeNode {
     private final String name;
     private final boolean executable;
@@ -16,7 +19,7 @@ public final class File implements TreeNode {
     }
 
     @Override
-    public int getMode() {
+    public int getType() {
         return executable ? 0100755 : 0100644;
     }
 

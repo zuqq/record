@@ -1,5 +1,8 @@
 package record;
 
+/**
+ * A tree node representing a directory.
+ */
 public final class Directory implements TreeNode {
     private final String name;
     private final byte[] tree;
@@ -10,7 +13,7 @@ public final class Directory implements TreeNode {
     }
 
     @Override
-    public int getMode() {
+    public int getType() {
         return 0040000;
     }
 

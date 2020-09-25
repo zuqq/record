@@ -1,8 +1,8 @@
 package record;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-
+/**
+ * A tree node representing a symbolic link.
+ */
 public final class SymbolicLink implements TreeNode {
     private final String name;
     private final byte[] blob;
@@ -13,7 +13,7 @@ public final class SymbolicLink implements TreeNode {
     }
 
     @Override
-    public int getMode() {
+    public int getType() {
         return 0120000;
     }
 

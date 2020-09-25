@@ -1,12 +1,11 @@
 package record;
 
 /**
- * A git reference.
+ * The content of a git reference.
  *
- * A reference is either a reference to a commit or a reference to another
- * reference; in the latter case we say that the reference is symbolic. The
- * HEAD file is usually a symbolic reference to a branch, but it can also refer
- * to a commit ("detached HEAD").
+ * A reference points to a commit or another reference; in the latter case we
+ * say that the reference is symbolic. The HEAD file is usually a symbolic
+ * reference to a branch, but it can also refer to a commit ("detached HEAD").
  */
 public final class ReferenceContent {
     private final boolean symbolic;
