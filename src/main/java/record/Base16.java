@@ -5,8 +5,10 @@ import java.text.MessageFormat;
 /**
  * Conversion to and from Base16.
  */
-public final class Base16 {
+final class Base16 {
     private static final String digits = "0123456789abcdef";
+
+    private Base16() {}
 
     /**
      * Convert bytes into Base16.

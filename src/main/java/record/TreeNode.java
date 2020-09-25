@@ -3,16 +3,14 @@ package record;
 import java.nio.charset.StandardCharsets;
 
 /**
- * A node in a {@link Tree}.
+ * A node in a {@link Tree}, i.e., a named {@link LooseObject}. It is serialized
+ * according to the following schema:
  *
- * A {@link TreeNode} is a named {@link LooseObject}. It is serialized according
- * to the following schema:
- *
- * <pre>{@code
- *     +------+----+------+-----+------+
- *     | type | SP | name | NUL | hash |
- *     +------+----+------+-----+------+
- * }</pre>
+ * <pre><code>
+ * +------+----+------+-----+------+
+ * | type | SP | name | NUL | hash |
+ * +------+----+------+-----+------+
+ * </code></pre>
  *
  * where {@code type} is an octal representation of node's type, {@code name} is
  * a string not containing the null byte, and {@code hash} is the hash of the

@@ -1,6 +1,11 @@
 package record;
 
-public class FirstZero {
+/**
+ * Find the first zero byte in a byte array.
+ */
+final class FirstZero {
+    private FirstZero() {}
+
     /**
      * Returns the index of the first zero byte in the subarray of {@code input}
      * starting at {@code offset}.

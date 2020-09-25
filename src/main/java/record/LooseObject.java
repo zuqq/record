@@ -9,11 +9,11 @@ import java.security.NoSuchAlgorithmException;
  *
  * The content of a loose git object is of the form
  *
- * <pre>{@code
- *     +------+----+-------------+-----+------+
- *     | type | SP | body length | NUL | body |
- *     +------+----+-------------+-----+------+
- * }</pre>
+ * <pre><code>
+ * +------+----+-------------+-----+------+
+ * | type | SP | body length | NUL | body |
+ * +------+----+-------------+-----+------+
+ * </code></pre>
  *
  * where {@code type} is a string representing the object's type (e.g., {@code "blob"})
  * and {@code body length} is the decimal representation of {@code body}'s length.

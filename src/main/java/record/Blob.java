@@ -27,7 +27,7 @@ public final class Blob implements LooseObject {
      */
     public static Blob parse(byte[] input) throws FatalParseException {
         int i = FirstZero.in(input);
-        String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
+        String header = new String(input, 0, i, StandardCharsets.UTF_8);
         if (!header.startsWith("blob ")) {
             throw new FatalParseException("Malformed header.");
         }

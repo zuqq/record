@@ -28,7 +28,7 @@ public final class Tree implements LooseObject {
      */
     public static Tree parse(byte[] input) throws FatalParseException {
         int i = FirstZero.in(input);
-        String header = new String(Arrays.copyOfRange(input, 0, i), StandardCharsets.UTF_8);
+        String header = new String(input, 0, i, StandardCharsets.UTF_8);
         if (!header.startsWith("tree ")) {
             throw new FatalParseException("Malformed header.");
         }
@@ -40,18 +40,15 @@ public final class Tree implements LooseObject {
         List<TreeNode> children = new ArrayList<>();
         while (i < input.length) {
             int j = FirstZero.in(input, i);
-            // It's j - i instead of j - i + 1 because we need to exclude '\0' itself.
             String prefix = new String(input, i, j - i, StandardCharsets.UTF_8);
             int spaceIndex = prefix.indexOf(' ');
             String name = prefix.substring(spaceIndex + 1);
-            // Skip past '\0' and the SHA-1 digest.
+            // Move to the start of the next entry.
             i = j + 21;
             byte[] hash = Arrays.copyOfRange(input, j + 1, i);
-            int type = Integer.parseInt(prefix.substring(0, spaceIndex - 4), 8);
-            int permissions = Integer.parseInt(prefix.substring(spaceIndex - 3, spaceIndex), 8);
-            TreeNode child = switch (type) {
+            TreeNode child = switch (Integer.parseInt(prefix.substring(0, spaceIndex - 4), 8)) {
                 case 004 -> new Directory(name, hash);
-                case 010 -> switch (permissions) {
+                case 010 -> switch (Integer.parseInt(prefix.substring(spaceIndex - 3, spaceIndex), 8)) {
                     case 0755 -> new File(name, true, hash);
                     case 0644 -> new File(name, false, hash);
                     default   -> throw new FatalParseException("Illegal file permissions.");

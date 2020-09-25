@@ -12,26 +12,26 @@ working directory at once.
 
 **Example**:
 
-```
-$ mvn compile
-$ export CLASSPATH="$(pwd)/target/classes"
+```bash
+mvn compile
+export CLASSPATH="$(pwd)/target/classes"
 
 # Navigate to the working directory.
-$ mkdir test-repo
-$ cd test-repo
+mkdir test-repo
+cd test-repo
 
 # Initialize the repository.
-$ java record.Main init
+java record.Main init
 
 # Create a file.
-$ echo 'a' > a
+echo 'a' > a
 
 # Set committer name and email.
-$ export GIT_COMMITTER_NAME="Jane Doe"
-$ export GIT_COMMITTER_EMAIL="jane@example.com"
+export GIT_COMMITTER_NAME="Jane Doe"
+export GIT_COMMITTER_EMAIL="jane@example.com"
 
 # Commit!
-$ java record.Main commit -m "Initial commit"
+java record.Main commit -m "Initial commit"
 ```
 
 Verify that a commit was created by running `git log`.
@@ -43,6 +43,7 @@ Run `git add .` to let the index catch up.
 **Help page:**
 
 ```
+$ java record.Main
 Usage:	record init
 	record commit -m MESSAGE
 	record checkout COMMIT
