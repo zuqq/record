@@ -37,7 +37,7 @@ public interface TreeNode {
      * @return A byte array containing the SHA-1 digest of the underlying
      *         {@link LooseObject}'s content.
      */
-    byte[] getTargetHash();
+    byte[] getObjectHash();
 
     /**
      * Serialize the node.
@@ -50,7 +50,7 @@ public interface TreeNode {
                 .getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[part.length + 20];
         System.arraycopy(part, 0, result, 0, part.length);
-        byte[] hash = getTargetHash();
+        byte[] hash = getObjectHash();
         System.arraycopy(hash, 0, result, part.length, hash.length);
         return result;
     }

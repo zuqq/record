@@ -38,7 +38,7 @@ public final class Repository {
     /**
      * Reads a reference.
      *
-     * The given {@code name} should be a fully qualified name such as "HEAD"
+     * The parameter {@code name} should be a fully qualified name such as "HEAD"
      * or "refs/heads/master".
      */
     private ReferenceContent readReference(String name) throws IOException {
@@ -50,7 +50,7 @@ public final class Repository {
     /**
      * Writes a reference.
      *
-     * The given {@code name} should be a fully qualified name such as "HEAD"
+     * The parameter {@code name} should be a fully qualified name such as "HEAD"
      * or "refs/heads/master".
      */
     private void writeReference(String name, ReferenceContent content) throws IOException {
@@ -82,7 +82,7 @@ public final class Repository {
     }
 
     /**
-     * Initialize the .git subdirectory.
+     * Initializes the .git subdirectory.
      *
      * @throws IOException If one of the required directories and files could not be created.
      */
@@ -100,7 +100,7 @@ public final class Repository {
      *
      * Note that this returns the inflated (i.e., decompressed) content.
      *
-     * The given {@code encodedHash} is the object's Base16-encoded hash.
+     * The parameter {@code encodedHash} is the object's Base16-encoded hash.
      */
     private byte[] readObject(String encodedHash) throws IOException {
         Path bucket = git.resolve("objects").resolve(encodedHash.substring(0, 2));
@@ -115,7 +115,7 @@ public final class Repository {
      *
      * Note that this returns the inflated (i.e., decompressed) content.
      *
-     * The given {@code encodedHash} is the object's hash.
+     * The parameter {@code hash} is the object's hash.
      */
     private byte[] readObject(byte[] hash) throws IOException {
         return readObject(Base16.encode(hash));
@@ -213,7 +213,7 @@ public final class Repository {
      *
      * Note that this writes the resulting git objects to the file system.
      *
-     * Returns the Base-16 encoded hash of the {@link Tree} corresponding to
+     * Returns the Base16-encoded hash of the {@link Tree} corresponding to
      * the current state of the working directory.
      */
     private String buildTree() throws IOException {
@@ -255,14 +255,14 @@ public final class Repository {
         @Override
         public void visit(Directory node) throws IOException {
             currentDirectory = currentDirectory.resolve(node.getName());
-            Tree.parse(readObject(node.getTargetHash())).accept(this);
+            Tree.parse(readObject(node.getObjectHash())).accept(this);
             currentDirectory = currentDirectory.getParent();
         }
 
         @Override
         public void visit(File node) throws IOException {
             Path path = currentDirectory.resolve(node.getName());
-            Files.write(path, Blob.parse(readObject(node.getTargetHash())).getBody());
+            Files.write(path, Blob.parse(readObject(node.getObjectHash())).getBody());
             Files.setPosixFilePermissions(path,
                     PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
         }
@@ -270,13 +270,13 @@ public final class Repository {
         @Override
         public void visit(SymbolicLink node) throws IOException {
             Files.createSymbolicLink(currentDirectory.resolve(node.getName()),
-                    Path.of(new String(Blob.parse(readObject(node.getTargetHash())).getBody(),
+                    Path.of(new String(Blob.parse(readObject(node.getObjectHash())).getBody(),
                                        StandardCharsets.UTF_8)));
         }
     }
 
     /**
-     * Replaces the working directory by the state of {@code tree}.
+     * Replaces the working directory by {@code tree}.
      */
     private void thawTree(Tree tree) throws IOException {
         tree.accept(new TreeRestorer());

@@ -29,7 +29,7 @@ public final class File implements TreeNode {
     }
 
     @Override
-    public byte[] getTargetHash() {
+    public byte[] getObjectHash() {
         return blob;
     }
 

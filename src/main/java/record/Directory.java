@@ -23,7 +23,7 @@ public final class Directory implements TreeNode {
     }
 
     @Override
-    public byte[] getTargetHash() {
+    public byte[] getObjectHash() {
         return tree;
     }
 
