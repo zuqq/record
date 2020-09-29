@@ -20,7 +20,7 @@ public final class File implements TreeNode {
 
     @Override
     public int getType() {
-        return executable ? 0100755 : 0100644;
+        return executable ? TreeNodeType.EXECUTABLE.getBits() : TreeNodeType.FILE.getBits();
     }
 
     @Override

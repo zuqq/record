@@ -14,7 +14,7 @@ public final class Directory implements TreeNode {
 
     @Override
     public int getType() {
-        return 0040000;
+        return TreeNodeType.DIRECTORY.getBits();
     }
 
     @Override

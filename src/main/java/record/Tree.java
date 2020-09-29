@@ -42,19 +42,16 @@ public final class Tree implements LooseObject {
             int j = FirstZero.in(input, i);
             String prefix = new String(input, i, j - i, StandardCharsets.UTF_8);
             int spaceIndex = prefix.indexOf(' ');
+            int bits = Integer.parseInt(prefix.substring(0, spaceIndex), 8);
             String name = prefix.substring(spaceIndex + 1);
             // Move to the start of the next entry.
             i = j + 21;
             byte[] hash = Arrays.copyOfRange(input, j + 1, i);
-            TreeNode child = switch (Integer.parseInt(prefix.substring(0, spaceIndex - 4), 8)) {
-                case 004 -> new Directory(name, hash);
-                case 010 -> switch (Integer.parseInt(prefix.substring(spaceIndex - 3, spaceIndex), 8)) {
-                    case 0755 -> new File(name, true, hash);
-                    case 0644 -> new File(name, false, hash);
-                    default   -> throw new FatalParseException("Illegal file permissions.");
-                };
-                case 012 -> new SymbolicLink(name, hash);
-                default  -> throw new FatalParseException("Illegal file type.");
+            TreeNode child = switch (TreeNodeType.parse(bits)) {
+                case DIRECTORY     -> new Directory(name, hash);
+                case EXECUTABLE    -> new File(name, true, hash);
+                case FILE          -> new File(name, false, hash);
+                case SYMBOLIC_LINK -> new SymbolicLink(name, hash);
             };
             children.add(child);
         }

@@ -14,7 +14,7 @@ public final class SymbolicLink implements TreeNode {
 
     @Override
     public int getType() {
-        return 0120000;
+        return TreeNodeType.SYMBOLIC_LINK.getBits();
     }
 
     @Override
