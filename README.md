@@ -24,7 +24,7 @@ cd test-repo
 java record.Main init
 
 # Create a file.
-echo 'a' > a
+echo "a" > a
 
 # Set committer name and email.
 export GIT_COMMITTER_NAME="Jane Doe"
