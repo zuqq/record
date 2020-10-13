@@ -8,7 +8,8 @@ it's unlikely to work on Windows.
 ## Usage
 
 Note that record doesn't use an index, so you can only commit your entire
-working directory at once.
+working directory at once. Not having an index also means that a new commit
+will be created even if no files were changed.
 
 **Example**:
 
