@@ -46,6 +46,6 @@ Run `git add .` to let the index catch up.
 ```
 $ java record.Main
 Usage:	record init
-	record commit -m MESSAGE
-	record checkout COMMIT
+	record commit -m <message>
+	record checkout <commit>
 ```

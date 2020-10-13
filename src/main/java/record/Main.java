@@ -9,8 +9,8 @@ public class Main {
     private static void usage() {
         System.err.print("Usage:");
         System.err.println("\trecord init");
-        System.err.println("\trecord commit -m MESSAGE");
-        System.err.println("\trecord checkout COMMIT");
+        System.err.println("\trecord commit -m <message>");
+        System.err.println("\trecord checkout <commit>");
         System.exit(-1);
     }
 
