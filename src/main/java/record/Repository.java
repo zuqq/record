@@ -28,11 +28,11 @@ import java.util.zip.InflaterInputStream;
  */
 public final class Repository {
     private final Path directory;
-    private final Path git;
+    private final Path gitDirectory;
 
     public Repository(Path directory) {
         this.directory = directory;
-        this.git = directory.resolve(".git");
+        this.gitDirectory = directory.resolve(".git");
     }
 
     /**
@@ -42,7 +42,7 @@ public final class Repository {
      * or "refs/heads/master".
      */
     private ReferenceContent readReference(String name) throws IOException {
-        String content = Files.readString(git.resolve(name));
+        String content = Files.readString(gitDirectory.resolve(name));
         // Remove trailing '\n'.
         return new ReferenceContent(content.substring(0, content.length() - 1));
     }
@@ -55,7 +55,7 @@ public final class Repository {
      */
     private void writeReference(String name, ReferenceContent content) throws IOException {
         // Add trailing '\n'.
-        Files.writeString(git.resolve(name), content.toString() + "\n");
+        Files.writeString(gitDirectory.resolve(name), content.toString() + "\n");
     }
 
     /**
@@ -69,7 +69,7 @@ public final class Repository {
      */
     private String resolveReference(String name) throws IOException {
         for (int i = 0; i < 5; ++i) {
-            if (!Files.exists(git.resolve(name))) {
+            if (!Files.exists(gitDirectory.resolve(name))) {
                 return name;
             }
             ReferenceContent content = readReference(name);
@@ -87,10 +87,10 @@ public final class Repository {
      * @throws IOException If one of the required directories and files could not be created.
      */
     public void init() throws IOException {
-        if (!Files.exists(git)) {
-            Files.createDirectories(git.resolve("objects"));
-            Files.createDirectories(git.resolve("refs/heads"));
-            Files.createDirectories(git.resolve("refs/tags"));
+        if (!Files.exists(gitDirectory)) {
+            Files.createDirectories(gitDirectory.resolve("objects"));
+            Files.createDirectories(gitDirectory.resolve("refs/heads"));
+            Files.createDirectories(gitDirectory.resolve("refs/tags"));
             writeReference("HEAD", new ReferenceContent(true, "refs/heads/master"));
         }
     }
@@ -103,7 +103,7 @@ public final class Repository {
      * The parameter {@code encodedHash} is the object's Base16-encoded hash.
      */
     private byte[] readObject(String encodedHash) throws IOException {
-        Path bucket = git.resolve("objects").resolve(encodedHash.substring(0, 2));
+        Path bucket = gitDirectory.resolve("objects").resolve(encodedHash.substring(0, 2));
         try (InputStream file = Files.newInputStream(bucket.resolve(encodedHash.substring(2)));
              InflaterInputStream stream = new InflaterInputStream(file)) {
             return stream.readAllBytes();
@@ -129,7 +129,7 @@ public final class Repository {
      */
     private void writeObject(LooseObject object) throws IOException {
         String encodedHash = Base16.encode(object.getHash());
-        Path bucket = git.resolve("objects").resolve(encodedHash.substring(0, 2));
+        Path bucket = gitDirectory.resolve("objects").resolve(encodedHash.substring(0, 2));
         if (!Files.exists(bucket)) {
             Files.createDirectory(bucket);
         }
@@ -143,12 +143,12 @@ public final class Repository {
         }
     }
 
-    private class TreeBuilder extends SimpleFileVisitor<Path> {
+    private class TreeFreezer extends SimpleFileVisitor<Path> {
         private final Path target;
         private final Map<Path, TreeNode> store = new HashMap<>();
         private String result = null;
 
-        public TreeBuilder(Path target) {
+        public TreeFreezer(Path target) {
             this.target = target;
         }
 
@@ -216,8 +216,8 @@ public final class Repository {
      * Returns the Base16-encoded hash of the {@link Tree} corresponding to
      * the current state of the working directory.
      */
-    private String buildTree() throws IOException {
-        TreeBuilder visitor = new TreeBuilder(directory);
+    private String freezeTree() throws IOException {
+        TreeFreezer visitor = new TreeFreezer(directory);
         Files.walkFileTree(directory, visitor);
         return visitor.getResult();
     }
@@ -236,19 +236,19 @@ public final class Repository {
     public void commit(User committer, String message) throws IOException {
         String head = resolveReference("HEAD");
         List<String> parents = new ArrayList<>();
-        if (Files.exists(git.resolve(head))) {
+        if (Files.exists(gitDirectory.resolve(head))) {
             parents.add(readReference(head).getTarget());
         }
         Timestamp timestamp = Timestamp.now();
-        Commit commit = new Commit(buildTree(), parents, committer, timestamp, committer, timestamp, message);
+        Commit commit = new Commit(freezeTree(), parents, committer, timestamp, committer, timestamp, message);
         writeObject(commit);
         writeReference(head, new ReferenceContent(commit));
     }
 
-    private class TreeRestorer implements TreeVisitor<IOException> {
+    private class TreeThawer implements TreeVisitor<IOException> {
         private Path currentDirectory;
 
-        public TreeRestorer() {
+        public TreeThawer() {
             this.currentDirectory = directory;
         }
 
@@ -279,10 +279,10 @@ public final class Repository {
      * Replaces the working directory by {@code tree}.
      */
     private void thawTree(Tree tree) throws IOException {
-        tree.accept(new TreeRestorer());
+        tree.accept(new TreeThawer());
     }
 
-    private static class Deleter extends SimpleFileVisitor<Path> {
+    private static class TreeClearer extends SimpleFileVisitor<Path> {
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
             return Files.isHidden(dir) ? FileVisitResult.SKIP_SUBTREE : FileVisitResult.CONTINUE;
@@ -318,7 +318,7 @@ public final class Repository {
      */
     public void checkout(String encodedCommitHash) throws IOException {
         byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));
-        Files.walkFileTree(directory, new Deleter());
+        Files.walkFileTree(directory, new TreeClearer());
         thawTree(Tree.parse(readObject(treeHash)));
         writeReference("HEAD", new ReferenceContent(encodedCommitHash));
     }
