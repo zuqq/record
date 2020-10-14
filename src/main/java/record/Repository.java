@@ -121,7 +121,6 @@ public final class Repository {
         return readObject(Base16.encode(hash));
     }
 
-
     /**
      * Writes a {@link LooseObject} to the object store.
      *
@@ -271,7 +270,7 @@ public final class Repository {
         public void visit(SymbolicLink node) throws IOException {
             Files.createSymbolicLink(currentDirectory.resolve(node.getName()),
                     Path.of(new String(Blob.parse(readObject(node.getObjectHash())).getBody(),
-                                       StandardCharsets.UTF_8)));
+                            StandardCharsets.UTF_8)));
         }
     }
 
