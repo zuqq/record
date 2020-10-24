@@ -8,8 +8,7 @@ it's unlikely to work on Windows.
 ## Usage
 
 Note that record doesn't use an index, so you can only commit your entire
-working directory at once. Not having an index also means that a new commit
-will be created even if no files were changed.
+working directory at once.
 
 **Example**:
 
@@ -34,12 +33,6 @@ export GIT_COMMITTER_EMAIL="jane@example.com"
 # Commit!
 java record.Main commit -m "Initial commit"
 ```
-
-Verify that a commit was created by running `git log`.
-
-If you look at the output of `git status`, you will see that git thinks that the
-working directory has changed; that's because record doesn't maintain the index.
-Run `git add .` to let the index catch up.
 
 **Help page:**
 
