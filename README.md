@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.com/zuqq/record.svg?branch=master)](https://travis-ci.com/zuqq/record)
 
-An implementation of the git object model. As it uses POSIX file permissions,
+An implementation of the Git object model. As it uses POSIX file permissions,
 it's unlikely to work on Windows.
 
 ## Usage
 
-Note that record doesn't use an index, so you can only commit your entire
+Note that Record doesn't use an index, so you can only commit your entire
 working directory at once.
 
 **Example**:
