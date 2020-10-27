@@ -89,10 +89,22 @@ public final class Repository {
     public void init() throws IOException {
         if (!Files.exists(gitDirectory)) {
             Files.createDirectories(gitDirectory.resolve("objects"));
+            // TODO: This is not portable!
             Files.createDirectories(gitDirectory.resolve("refs/heads"));
             Files.createDirectories(gitDirectory.resolve("refs/tags"));
             writeReference("HEAD", new ReferenceContent(true, "refs/heads/master"));
         }
+    }
+
+    private Path getObjectPath(String encodedHash) {
+        return gitDirectory
+                .resolve("objects")
+                .resolve(encodedHash.substring(0, 2))
+                .resolve(encodedHash.substring(2));
+    }
+
+    private Path getObjectPath(byte[] hash) {
+        return getObjectPath(Base16.encode(hash));
     }
 
     /**
@@ -103,8 +115,7 @@ public final class Repository {
      * The parameter {@code encodedHash} is the object's Base16-encoded hash.
      */
     private byte[] readObject(String encodedHash) throws IOException {
-        Path bucket = gitDirectory.resolve("objects").resolve(encodedHash.substring(0, 2));
-        try (InputStream file = Files.newInputStream(bucket.resolve(encodedHash.substring(2)));
+        try (InputStream file = Files.newInputStream(getObjectPath(encodedHash));
              InflaterInputStream stream = new InflaterInputStream(file)) {
             return stream.readAllBytes();
         }
@@ -127,12 +138,11 @@ public final class Repository {
      * Note that this deflates (i.e., compresses) the content.
      */
     private void writeObject(LooseObject object) throws IOException {
-        String encodedHash = Base16.encode(object.getHash());
-        Path bucket = gitDirectory.resolve("objects").resolve(encodedHash.substring(0, 2));
+        Path path = getObjectPath(object.getHash());
+        Path bucket = path.getParent();
         if (!Files.exists(bucket)) {
             Files.createDirectory(bucket);
         }
-        Path path = bucket.resolve(encodedHash.substring(2));
         if (!Files.exists(path)) {
             try (OutputStream file = Files.newOutputStream(path);
                  DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
