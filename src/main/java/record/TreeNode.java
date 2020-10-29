@@ -48,9 +48,9 @@ public interface TreeNode {
         byte[] part = String
                 .format("%o %s\0", getType().getBits(), getName())
                 .getBytes(StandardCharsets.UTF_8);
-        byte[] result = new byte[part.length + 20];
-        System.arraycopy(part, 0, result, 0, part.length);
         byte[] hash = getObjectHash();
+        byte[] result = new byte[part.length + hash.length];
+        System.arraycopy(part, 0, result, 0, part.length);
         System.arraycopy(hash, 0, result, part.length, hash.length);
         return result;
     }
