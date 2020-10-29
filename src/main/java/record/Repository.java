@@ -254,10 +254,10 @@ public final class Repository {
         writeReference(head, new Reference(commit));
     }
 
-    private class TreeNodeThawer implements TreeNodeVisitor<IOException> {
+    private class TreeThawer implements TreeNodeVisitor<IOException> {
         private Path currentDirectory;
 
-        public TreeNodeThawer() {
+        public TreeThawer() {
             this.currentDirectory = directory;
         }
 
@@ -288,7 +288,7 @@ public final class Repository {
      * Replaces the working directory by {@code tree}.
      */
     private void thawTree(Tree tree) throws IOException {
-        tree.accept(new TreeNodeThawer());
+        tree.accept(new TreeThawer());
     }
 
     private static class TreeClearer extends SimpleFileVisitor<Path> {
