@@ -41,10 +41,10 @@ public final class Repository {
      * The parameter {@code name} should be a fully qualified name such as "HEAD"
      * or "refs/heads/master".
      */
-    private ReferenceContent readReference(String name) throws IOException {
+    private Reference readReference(String name) throws IOException {
         String content = Files.readString(gitDirectory.resolve(name));
         // Remove trailing '\n'.
-        return new ReferenceContent(content.substring(0, content.length() - 1));
+        return new Reference(content.substring(0, content.length() - 1));
     }
 
     /**
@@ -53,7 +53,7 @@ public final class Repository {
      * The parameter {@code name} should be a fully qualified name such as "HEAD"
      * or "refs/heads/master".
      */
-    private void writeReference(String name, ReferenceContent content) throws IOException {
+    private void writeReference(String name, Reference content) throws IOException {
         // Add trailing '\n'.
         Files.writeString(gitDirectory.resolve(name), content.toString() + "\n");
     }
@@ -72,7 +72,7 @@ public final class Repository {
             if (!Files.exists(gitDirectory.resolve(name))) {
                 return name;
             }
-            ReferenceContent content = readReference(name);
+            Reference content = readReference(name);
             if (!content.isSymbolic()) {
                 return name;
             }
@@ -92,7 +92,7 @@ public final class Repository {
             // TODO: This is not portable!
             Files.createDirectories(gitDirectory.resolve("refs/heads"));
             Files.createDirectories(gitDirectory.resolve("refs/tags"));
-            writeReference("HEAD", new ReferenceContent(true, "refs/heads/master"));
+            writeReference("HEAD", new Reference(true, "refs/heads/master"));
         }
     }
 
@@ -251,7 +251,7 @@ public final class Repository {
         Timestamp timestamp = Timestamp.now();
         Commit commit = new Commit(freezeTree(), parents, committer, timestamp, committer, timestamp, message);
         writeObject(commit);
-        writeReference(head, new ReferenceContent(commit));
+        writeReference(head, new Reference(commit));
     }
 
     private class TreeNodeThawer implements TreeNodeVisitor<IOException> {
@@ -329,6 +329,6 @@ public final class Repository {
         byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));
         Files.walkFileTree(directory, new TreeClearer());
         thawTree(Tree.parse(readObject(treeHash)));
-        writeReference("HEAD", new ReferenceContent(encodedCommitHash));
+        writeReference("HEAD", new Reference(encodedCommitHash));
     }
 }
