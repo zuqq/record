@@ -3,7 +3,6 @@ package record;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Main {
     private static void usage() {
@@ -30,7 +29,7 @@ public class Main {
     }
 
     public static void main(String... args) throws IOException {
-        Path directory = Paths.get(".").toRealPath();
+        Path directory = Path.of(".").toRealPath();
         if (args.length == 1 && args[0].equals("init")) {
             new Repository(directory).init();
         } else if (args.length == 3 && args[0].equals("commit") && args[1].equals("-m")) {
