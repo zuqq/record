@@ -27,6 +27,10 @@ import java.util.zip.InflaterInputStream;
  * is stored in the .git subdirectory.
  */
 public final class Repository {
+    private static final String OBJECT_PREFIX = "objects/";
+    private static final String BRANCH_PREFIX = "refs/heads/";
+    private static final String HEAD = "HEAD";
+
     private final Path directory;
     private final Path gitDirectory;
 
@@ -42,9 +46,7 @@ public final class Repository {
      * or "refs/heads/master".
      */
     private Reference readReference(String name) throws IOException {
-        String content = Files.readString(gitDirectory.resolve(name));
-        // Remove trailing '\n'.
-        return new Reference(content.substring(0, content.length() - 1));
+        return Reference.of(name, Files.readString(gitDirectory.resolve(name), StandardCharsets.UTF_8));
     }
 
     /**
@@ -53,32 +55,8 @@ public final class Repository {
      * The parameter {@code name} should be a fully qualified name such as "HEAD"
      * or "refs/heads/master".
      */
-    private void writeReference(String name, Reference content) throws IOException {
-        // Add trailing '\n'.
-        Files.writeString(gitDirectory.resolve(name), content.toString() + "\n");
-    }
-
-    /**
-     * Recursively resolves the given reference.
-     *
-     * Reads the reference {@code name} and follows symbolic references until
-     * it finds one that is null (i.e., the corresponding file doesn't exist)
-     * or points to a commit. Returns the name of that final reference.
-     *
-     * Sets a maximal number of redirects to break cycles.
-     */
-    private String resolveReference(String name) throws IOException {
-        for (int i = 0; i < 5; ++i) {
-            if (!Files.exists(gitDirectory.resolve(name))) {
-                return name;
-            }
-            Reference content = readReference(name);
-            if (!content.isSymbolic()) {
-                return name;
-            }
-            name = content.getTarget();
-        }
-        throw new RuntimeException("Too many redirects.");
+    private void writeReference(Reference reference) throws IOException {
+        Files.writeString(gitDirectory.resolve(reference.getName()), reference.toString(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -88,17 +66,15 @@ public final class Repository {
      */
     public void init() throws IOException {
         if (!Files.exists(gitDirectory)) {
-            Files.createDirectories(gitDirectory.resolve("objects"));
-            // TODO: This is not portable!
-            Files.createDirectories(gitDirectory.resolve("refs/heads"));
-            Files.createDirectories(gitDirectory.resolve("refs/tags"));
-            writeReference("HEAD", new Reference(true, "refs/heads/master"));
+            Files.createDirectories(gitDirectory.resolve(OBJECT_PREFIX));
+            Files.createDirectories(gitDirectory.resolve(BRANCH_PREFIX));
+            writeReference(new Reference(HEAD, true, BRANCH_PREFIX + "master"));
         }
     }
 
     private Path getObjectPath(String encodedHash) {
         return gitDirectory
-                .resolve("objects")
+                .resolve(OBJECT_PREFIX)
                 .resolve(encodedHash.substring(0, 2))
                 .resolve(encodedHash.substring(2));
     }
@@ -243,15 +219,30 @@ public final class Repository {
      * @throws IOException If one of the steps failed.
      */
     public void commit(User committer, String message) throws IOException {
-        String head = resolveReference("HEAD");
+        Reference head = readReference(HEAD);
+        String resolvedName = head.isSymbolic() ? head.getTarget() : HEAD;
         List<String> parents = new ArrayList<>();
-        if (Files.exists(gitDirectory.resolve(head))) {
-            parents.add(readReference(head).getTarget());
+        if (Files.exists(gitDirectory.resolve(resolvedName))) {
+            parents.add(readReference(resolvedName).getTarget());
         }
         Timestamp timestamp = Timestamp.now();
         Commit commit = new Commit(freezeTree(), parents, committer, timestamp, committer, timestamp, message);
         writeObject(commit);
-        writeReference(head, new Reference(commit));
+        writeReference(new Reference(resolvedName, commit));
+    }
+
+    /**
+     * Creates a new branch that points to the current commit.
+     *
+     * @param name Name of the branch.
+     * @throws IOException If the new branch couldn't be created.
+     */
+    public void branch(String name) throws IOException {
+        Reference head = readReference(HEAD);
+        String encodedHash = head.isSymbolic()
+                ? readReference(head.getTarget()).getTarget()
+                : head.getTarget();
+        writeReference(new Reference(BRANCH_PREFIX + name, false, encodedHash));
     }
 
     private class TreeThawer implements TreeNodeVisitor<IOException> {
@@ -322,13 +313,25 @@ public final class Repository {
      * Note this is a destructive operation: it discards the current state of
      * the working directory.
      *
-     * @param encodedCommitHash The Base16-encoded hash of the commit to check out.
+     * @param name The branch name or Base16-encoded commit hash to check out.
      * @throws IOException If the checkout failed.
      */
-    public void checkout(String encodedCommitHash) throws IOException {
-        byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));
+    public void checkout(String name) throws IOException {
+        String branch = BRANCH_PREFIX + name;
+        Reference newHead;
+        String encodedCommitHash;
+        // Determine whether we're given a branch or commit. It's not enough to
+        // look at the name, because branches can be named after commits.
+        if (Files.exists(gitDirectory.resolve(branch))) {
+            newHead = new Reference(HEAD, true, branch);
+            encodedCommitHash = readReference(branch).getTarget();
+        } else {
+            newHead = new Reference(HEAD, false, name);
+            encodedCommitHash = name;
+        }
         Files.walkFileTree(directory, new TreeClearer());
+        byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));
         thawTree(Tree.parse(readObject(treeHash)));
-        writeReference("HEAD", new Reference(encodedCommitHash));
+        writeReference(newHead);
     }
 }

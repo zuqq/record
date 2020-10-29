@@ -10,7 +10,8 @@ public class Main {
         System.err.print("Usage:");
         System.err.println("\trecord init");
         System.err.println("\trecord commit -m <message>");
-        System.err.println("\trecord checkout <commit>");
+        System.err.println("\trecord branch <branch>");
+        System.err.println("\trecord checkout <branch or commit>");
         System.exit(-1);
     }
 
@@ -39,6 +40,8 @@ public class Main {
                 throw new RuntimeException("Need GIT_COMMITTER_NAME and GIT_COMMITTER_EMAIL set.");
             }
             new Repository(findWorkingDirectory(directory)).commit(new User(name, email), args[2]);
+        } else if (args.length == 2 && args[0].equals("branch")) {
+            new Repository(findWorkingDirectory(directory)).branch(args[1]);
         } else if (args.length == 2 && args[0].equals("checkout")) {
             new Repository(findWorkingDirectory(directory)).checkout(args[1]);
         } else {
