@@ -19,8 +19,8 @@ public final class File implements TreeNode {
     }
 
     @Override
-    public int getType() {
-        return executable ? TreeNodeType.EXECUTABLE.getBits() : TreeNodeType.FILE.getBits();
+    public TreeNodeType getType() {
+        return executable ? TreeNodeType.EXECUTABLE : TreeNodeType.FILE;
     }
 
     @Override

@@ -20,9 +20,9 @@ public interface TreeNode {
     /**
      * Get the node's type.
      *
-     * @return An integer representing the node's type.
+     * @return An instance of {@link TreeNodeType}.
      */
-    int getType();
+    TreeNodeType getType();
 
     /**
      * Get the node's name.
@@ -46,7 +46,7 @@ public interface TreeNode {
      */
     default byte[] toEntry() {
         byte[] part = String
-                .format("%o %s\0", getType(), getName())
+                .format("%o %s\0", getType().getBits(), getName())
                 .getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[part.length + 20];
         System.arraycopy(part, 0, result, 0, part.length);

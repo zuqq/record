@@ -13,8 +13,8 @@ public final class SymbolicLink implements TreeNode {
     }
 
     @Override
-    public int getType() {
-        return TreeNodeType.SYMBOLIC_LINK.getBits();
+    public TreeNodeType getType() {
+        return TreeNodeType.SYMBOLIC_LINK;
     }
 
     @Override

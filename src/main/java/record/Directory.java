@@ -13,8 +13,8 @@ public final class Directory implements TreeNode {
     }
 
     @Override
-    public int getType() {
-        return TreeNodeType.DIRECTORY.getBits();
+    public TreeNodeType getType() {
+        return TreeNodeType.DIRECTORY;
     }
 
     @Override
