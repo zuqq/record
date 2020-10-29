@@ -28,7 +28,7 @@ public final class Directory implements TreeNode {
     }
 
     @Override
-    public <E extends Exception> void accept(TreeVisitor<E> visitor) throws E {
+    public <E extends Exception> void accept(TreeNodeVisitor<E> visitor) throws E {
         visitor.visit(this);
     }
 }

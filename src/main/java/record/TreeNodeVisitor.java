@@ -1,6 +1,6 @@
 package record;
 
-public interface TreeVisitor<E extends Exception> {
+public interface TreeNodeVisitor<E extends Exception> {
     void visit(Directory node) throws E;
 
     void visit(File node) throws E;

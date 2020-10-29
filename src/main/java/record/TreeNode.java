@@ -55,5 +55,5 @@ public interface TreeNode {
         return result;
     }
 
-    <E extends Exception> void accept(TreeVisitor<E> visitor) throws E;
+    <E extends Exception> void accept(TreeNodeVisitor<E> visitor) throws E;
 }
