@@ -308,7 +308,7 @@ public final class Repository {
     }
 
     /**
-     * Restores the working directory to the state of {@code encodedCommitHash}.
+     * Restores the working directory to the state of {@code name}.
      *
      * Note this is a destructive operation: it discards the current state of
      * the working directory.

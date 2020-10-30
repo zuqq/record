@@ -40,5 +40,6 @@ java record.Main commit -m "Initial commit"
 $ java record.Main
 Usage:	record init
 	record commit -m <message>
-	record checkout <commit>
+	record branch <branch>
+	record checkout <branch or commit>
 ```
