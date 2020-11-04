@@ -21,21 +21,6 @@ public class RepositoryTest {
                 Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
     }
 
-    @Test
-    void commit() throws IOException {
-        Path directory = Files.createTempDirectory("record");
-        Repository repository = new Repository(directory);
-        repository.init();
-        Files.writeString(directory.resolve("a"), "a\n", StandardCharsets.UTF_8);
-        Files.writeString(directory.resolve("b"), "b\n", StandardCharsets.UTF_8);
-
-        repository.commit(new User("Jane Doe", "jane@example.com"),
-                Timestamp.of("1599568789 +0200"), "Initial commit");
-
-        Assertions.assertEquals("42a22126b2d4fef6dd6537ecad0e63be1bc4c210\n",
-                Files.readString(directory.resolve(".git/refs/heads/master"), StandardCharsets.UTF_8));
-    }
-
     @Nested
     class WithSetup {
         private Path directory;
@@ -50,6 +35,12 @@ public class RepositoryTest {
             Files.writeString(directory.resolve("b"), "b\n", StandardCharsets.UTF_8);
             repository.commit(new User("Jane Doe", "jane@example.com"),
                     Timestamp.of("1599568789 +0200"), "Initial commit");
+        }
+
+        @Test
+        void commit() throws IOException {
+            Assertions.assertEquals("42a22126b2d4fef6dd6537ecad0e63be1bc4c210\n",
+                    Files.readString(directory.resolve(".git/refs/heads/master"), StandardCharsets.UTF_8));
         }
 
         @Test
