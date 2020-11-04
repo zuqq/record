@@ -24,6 +24,10 @@ public class Base16Test {
         } catch (FatalParseException e) {
             Assertions.fail("Parser failed on valid input.");
         }
-    }
 
+        Assertions.assertThrows(FatalParseException.class, () -> Base16.decode("a"));
+
+        Assertions.assertThrows(FatalParseException.class, () -> Base16.decode("ax"));
+        Assertions.assertThrows(FatalParseException.class, () -> Base16.decode("xa"));
+    }
 }
