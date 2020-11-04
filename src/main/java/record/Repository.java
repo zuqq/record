@@ -218,14 +218,13 @@ public final class Repository {
      * @param message The commit message.
      * @throws IOException If one of the steps failed.
      */
-    public void commit(User committer, String message) throws IOException {
+    public void commit(User committer, Timestamp timestamp, String message) throws IOException {
         Reference head = readReference(HEAD);
         String resolvedName = head.isSymbolic() ? head.getTarget() : HEAD;
         List<String> parents = new ArrayList<>();
         if (Files.exists(gitDirectory.resolve(resolvedName))) {
             parents.add(readReference(resolvedName).getTarget());
         }
-        Timestamp timestamp = Timestamp.now();
         Commit commit = new Commit(freezeTree(), parents, committer, timestamp, committer, timestamp, message);
         writeObject(commit);
         writeReference(new Reference(resolvedName, commit));
