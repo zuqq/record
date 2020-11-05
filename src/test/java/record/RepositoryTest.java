@@ -31,15 +31,15 @@ public class RepositoryTest {
             directory = Files.createTempDirectory("record");
             repository = new Repository(directory);
             repository.init();
-            Files.writeString(directory.resolve("a"), "a\n", StandardCharsets.UTF_8);
-            Files.writeString(directory.resolve("b"), "b\n", StandardCharsets.UTF_8);
+            Files.createDirectory(directory.resolve("src"));
+            Files.writeString(directory.resolve("src/a"), "a\n", StandardCharsets.UTF_8);
             repository.commit(new User("Jane Doe", "jane@example.com"),
-                    Timestamp.of("1599568789 +0200"), "Initial commit");
+                    Timestamp.of("1604560870 +0100"), "Initial commit");
         }
 
         @Test
         void commit() throws IOException {
-            Assertions.assertEquals("42a22126b2d4fef6dd6537ecad0e63be1bc4c210\n",
+            Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/refs/heads/master"), StandardCharsets.UTF_8));
         }
 
@@ -47,22 +47,30 @@ public class RepositoryTest {
         void branch() throws IOException {
             repository.branch("init");
 
-            Assertions.assertEquals("42a22126b2d4fef6dd6537ecad0e63be1bc4c210\n",
+            Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/refs/heads/init"), StandardCharsets.UTF_8));
         }
 
         @Test
         void checkout() throws IOException {
-            repository.branch("init");
-            Files.writeString(directory.resolve("c"), "more stuff\n", StandardCharsets.UTF_8);
+            Files.createDirectory(directory.resolve("x"));
+            Files.writeString(directory.resolve("x/.x"), "x\n", StandardCharsets.UTF_8);
+            Files.createSymbolicLink(directory.resolve("a"), directory.resolve("src/a"));
             repository.commit(new User("Jane Doe", "jane@example.com"),
-                    Timestamp.of("1599568810 +0200"), "Add more stuff");
+                    Timestamp.of("1604560898 +0100"), "Add more stuff");
 
-            repository.checkout("init");
+            repository.checkout("3d55094ecc4dc83fccdeac612207d3f313b570ce");
 
-            Assertions.assertEquals("ref: refs/heads/init\n",
+            Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
-            Assertions.assertFalse(Files.exists(directory.resolve("c")));
+            Assertions.assertTrue(Files.exists(directory.resolve("x/.x")));
+            Assertions.assertFalse(Files.exists(directory.resolve("a")));
+
+            repository.checkout("master");
+
+            Assertions.assertEquals("ref: refs/heads/master\n",
+                    Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
+            Assertions.assertTrue(Files.exists(directory.resolve("a")));
         }
     }
 }

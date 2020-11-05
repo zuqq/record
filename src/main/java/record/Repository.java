@@ -254,6 +254,7 @@ public final class Repository {
         @Override
         public void visit(Directory node) throws IOException {
             currentDirectory = currentDirectory.resolve(node.getName());
+            Files.createDirectories(currentDirectory);
             Tree.parse(readObject(node.getObjectHash())).accept(this);
             currentDirectory = currentDirectory.getParent();
         }
