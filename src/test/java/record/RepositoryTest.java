@@ -63,14 +63,16 @@ public class RepositoryTest {
 
             Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
-            Assertions.assertTrue(Files.exists(directory.resolve("x/.x")));
+            Assertions.assertEquals("x\n",
+                    Files.readString(directory.resolve("x/.x"), StandardCharsets.UTF_8));
             Assertions.assertFalse(Files.exists(directory.resolve("a")));
 
             repository.checkout("master");
 
             Assertions.assertEquals("ref: refs/heads/master\n",
                     Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
-            Assertions.assertTrue(Files.exists(directory.resolve("a")));
+            Assertions.assertEquals(directory.resolve("src/a"),
+                    Files.readSymbolicLink(directory.resolve("a")));
         }
     }
 }
