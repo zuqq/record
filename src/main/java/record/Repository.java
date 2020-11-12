@@ -19,12 +19,12 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
- * A git repository.
+ * A Git repository.
  *
- * An instance of this class consists of the working directory's location
+ * <p>An instance of this class consists of the working directory's location
  * (i.e., {@link #directory}) and a number of methods that operate on the
  * working directory. Everything else ({@link Blob}s, {@link Commit}s, etc.)
- * is stored in the .git subdirectory.
+ * is stored in the {@code .git} subdirectory.
  */
 public final class Repository {
     private static final String OBJECT_PREFIX = "objects/";
@@ -42,8 +42,8 @@ public final class Repository {
     /**
      * Reads a reference.
      *
-     * The parameter {@code name} should be a fully qualified name such as "HEAD"
-     * or "refs/heads/master".
+     * @param name A fully qualified reference name such as {@code "HEAD"} or
+     *             {@code "refs/heads/master"}.
      */
     private Reference readReference(String name) throws IOException {
         return Reference.of(name, Files.readString(gitDirectory.resolve(name), StandardCharsets.UTF_8));
@@ -51,18 +51,16 @@ public final class Repository {
 
     /**
      * Writes a reference.
-     *
-     * The parameter {@code name} should be a fully qualified name such as "HEAD"
-     * or "refs/heads/master".
      */
     private void writeReference(Reference reference) throws IOException {
         Files.writeString(gitDirectory.resolve(reference.getName()), reference.toString(), StandardCharsets.UTF_8);
     }
 
     /**
-     * Initializes the .git subdirectory.
+     * Initializes the {@code .git} subdirectory.
      *
-     * @throws IOException If one of the required directories and files could not be created.
+     * @throws IOException If one of the required directories and files could
+     *                     not be created.
      */
     public void init() throws IOException {
         if (!Files.exists(gitDirectory)) {
@@ -86,13 +84,13 @@ public final class Repository {
     /**
      * Reads a {@link LooseObject} from the object store.
      *
-     * Note that this returns the inflated (i.e., decompressed) content.
+     * <p>Note that this returns the inflated (i.e., decompressed) content.
      *
-     * The parameter {@code encodedHash} is the object's Base16-encoded hash.
+     * @param encodedHash The object's Base16-encoded hash.
      */
     private byte[] readObject(String encodedHash) throws IOException {
         try (InputStream file = Files.newInputStream(getObjectPath(encodedHash));
-             InflaterInputStream stream = new InflaterInputStream(file)) {
+                InflaterInputStream stream = new InflaterInputStream(file)) {
             return stream.readAllBytes();
         }
     }
@@ -100,9 +98,9 @@ public final class Repository {
     /**
      * Reads a {@link LooseObject} from the object store.
      *
-     * Note that this returns the inflated (i.e., decompressed) content.
+     * <p>Note that this returns the inflated (i.e., decompressed) content.
      *
-     * The parameter {@code hash} is the object's hash.
+     * @param hash The object's hash.
      */
     private byte[] readObject(byte[] hash) throws IOException {
         return readObject(Base16.encode(hash));
@@ -111,7 +109,7 @@ public final class Repository {
     /**
      * Writes a {@link LooseObject} to the object store.
      *
-     * Note that this deflates (i.e., compresses) the content.
+     * <p>Note that this deflates (i.e., compresses) the content.
      */
     private void writeObject(LooseObject object) throws IOException {
         Path path = getObjectPath(object.getHash());
@@ -121,7 +119,7 @@ public final class Repository {
         }
         if (!Files.exists(path)) {
             try (OutputStream file = Files.newOutputStream(path);
-                 DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
+                    DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
                 stream.write(object.getBytes());
             }
             Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("r--r--r--"));
@@ -196,10 +194,10 @@ public final class Repository {
     /**
      * Takes a snapshot of the working directory.
      *
-     * Note that this writes the resulting git objects to the file system.
+     * <p>Note that this writes the resulting Git objects to the file system.
      *
-     * Returns the Base16-encoded hash of the {@link Tree} corresponding to
-     * the current state of the working directory.
+     * @return The Base16-encoded hash of the {@link Tree} corresponding to the
+     *         current state of the working directory.
      */
     private String freezeTree() throws IOException {
         TreeFreezer visitor = new TreeFreezer(directory);
@@ -210,12 +208,13 @@ public final class Repository {
     /**
      * Commits the entire working directory.
      *
-     * Creates a new commit object reflecting the current state of the working
-     * directory, writes the commit object to the object store, and then
-     * advances the HEAD.
+     * <p>Creates a new commit object reflecting the current state of the
+     * working directory, writes the commit object to the object store, and
+     * then advances {@code HEAD}.
      *
      * @param committer Who is creating the commit.
-     * @param message The commit message.
+     * @param timestamp When the commit is being created.
+     * @param message   The commit message.
      * @throws IOException If one of the steps failed.
      */
     public void commit(User committer, Timestamp timestamp, String message) throws IOException {
@@ -238,9 +237,7 @@ public final class Repository {
      */
     public void branch(String name) throws IOException {
         Reference head = readReference(HEAD);
-        String encodedHash = head.isSymbolic()
-                ? readReference(head.getTarget()).getTarget()
-                : head.getTarget();
+        String encodedHash = head.isSymbolic() ? readReference(head.getTarget()).getTarget() : head.getTarget();
         writeReference(new Reference(BRANCH_PREFIX + name, false, encodedHash));
     }
 
@@ -263,15 +260,17 @@ public final class Repository {
         public void visit(File node) throws IOException {
             Path path = currentDirectory.resolve(node.getName());
             Files.write(path, Blob.parse(readObject(node.getObjectHash())).getBody());
-            Files.setPosixFilePermissions(path,
-                    PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
+            Files.setPosixFilePermissions(
+                    path, PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
         }
 
         @Override
         public void visit(SymbolicLink node) throws IOException {
-            Files.createSymbolicLink(currentDirectory.resolve(node.getName()),
-                    Path.of(new String(Blob.parse(readObject(node.getObjectHash())).getBody(),
-                            StandardCharsets.UTF_8)));
+            Files.createSymbolicLink(
+                    currentDirectory.resolve(node.getName()),
+                    Path.of(
+                            new String(
+                                    Blob.parse(readObject(node.getObjectHash())).getBody(), StandardCharsets.UTF_8)));
         }
     }
 
@@ -310,7 +309,7 @@ public final class Repository {
     /**
      * Restores the working directory to the state of {@code name}.
      *
-     * Note this is a destructive operation: it discards the current state of
+     * <p>Note this is a destructive operation: it discards the current state of
      * the working directory.
      *
      * @param name The branch name or Base16-encoded commit hash to check out.

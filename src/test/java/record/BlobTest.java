@@ -18,17 +18,11 @@ public class BlobTest {
             Assertions.fail("Parser failed on valid input.", e);
         }
     }
-    
+
     @Test
     void getHash() {
-        Assertions.assertEquals(
-            "78981922613b2afb6025042ff6bd878ac1994e85", Base16.encode(a.getHash())
-        );
-        Assertions.assertEquals(
-            "61780798228d17af2d34fce4cfbdf35556832472", Base16.encode(b.getHash())
-        );
-        Assertions.assertEquals(
-            "de8ed3a567a5e7f2f7eb99365f8b4e144a08ce77", Base16.encode(c.getHash())
-        );
+        Assertions.assertEquals("78981922613b2afb6025042ff6bd878ac1994e85", Base16.encode(a.getHash()));
+        Assertions.assertEquals("61780798228d17af2d34fce4cfbdf35556832472", Base16.encode(b.getHash()));
+        Assertions.assertEquals("de8ed3a567a5e7f2f7eb99365f8b4e144a08ce77", Base16.encode(c.getHash()));
     }
 }

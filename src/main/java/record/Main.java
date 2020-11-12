@@ -15,8 +15,9 @@ public class Main {
     }
 
     /**
-     * Traverses the file system upwards from the given directory until it
-     * finds one that has a {@code .git} subfolder.
+     * Finds the closest ancestor of {@code directory} that has a {@code .git} subdirectory.
+     *
+     * @throws IOException If none of the ancestors has a {@code .git} subdirectory.
      */
     private static Path findWorkingDirectory(Path directory) throws IOException {
         while (directory != null) {
@@ -38,8 +39,8 @@ public class Main {
             if (name == null || email == null) {
                 throw new RuntimeException("Need GIT_COMMITTER_NAME and GIT_COMMITTER_EMAIL set.");
             }
-            new Repository(findWorkingDirectory(directory)).commit(new User(name, email),
-                    Timestamp.now(), args[2]);
+            new Repository(findWorkingDirectory(directory))
+                    .commit(new User(name, email), Timestamp.now(), args[2]);
         } else if (args.length == 2 && args[0].equals("branch")) {
             new Repository(findWorkingDirectory(directory)).branch(args[1]);
         } else if (args.length == 2 && args[0].equals("checkout")) {

@@ -4,18 +4,17 @@ package record;
  * Find the first zero byte in a byte array.
  */
 final class FirstZero {
-    private FirstZero() {}
+    private FirstZero() {
+        // No instantiation.
+    }
 
     /**
-     * Returns the index of the first zero byte in the subarray of {@code input}
-     * starting at {@code offset}.
+     * Returns the index of the first zero byte in {@code input} from {@code offset} on.
      *
-     * @param input A byte array.
+     * @param input  A byte array.
      * @param offset An offset in the byte array.
-     * @return The index of the first zero byte in the subarray of {@code input}
-     *         starting at {@code offset}.
-     * @throws FatalParseException If the subarray of {@code input} starting at
-     *         {@code offset} contains no zero byte.
+     * @return The index of the first zero byte in {@code input} from {@code offset} on.
+     * @throws FatalParseException If no such byte exists.
      */
     public static int in(byte[] input, int offset) throws FatalParseException {
         for (int i = offset; i < input.length; ++i) {
@@ -31,7 +30,7 @@ final class FirstZero {
      *
      * @param input A byte array.
      * @return The index of the first zero byte in {@code input}.
-     * @throws FatalParseException If {@code input} contains no zero byte.
+     * @throws FatalParseException If no such byte exists.
      */
     public static int in(byte[] input) throws FatalParseException {
         return in(input, 0);

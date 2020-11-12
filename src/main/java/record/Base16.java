@@ -8,7 +8,9 @@ import java.text.MessageFormat;
 final class Base16 {
     private static final String digits = "0123456789abcdef";
 
-    private Base16() {}
+    private Base16() {
+        // No instantiation.
+    }
 
     /**
      * Convert bytes into Base16.
@@ -42,8 +44,7 @@ final class Base16 {
             int y = digits.indexOf(string.charAt(2 * i + 1));
             if (x == -1 || y == -1) {
                 throw new FatalParseException(
-                    MessageFormat.format("Invalid hexadecimal byte at position {0}.", 2 * i)
-                );
+                        MessageFormat.format("Invalid hexadecimal byte at position {0}.", 2 * i));
             }
             result[i] = (byte) ((x << 4) + y);
         }

@@ -1,10 +1,10 @@
 package record;
 
 public enum TreeNodeType {
-    DIRECTORY     (0040000),
-    EXECUTABLE    (0100755),
-    FILE          (0100644),
-    SYMBOLIC_LINK (0120000);
+    DIRECTORY(0040000),
+    EXECUTABLE(0100755),
+    FILE(0100644),
+    SYMBOLIC_LINK(0120000);
 
     private final int bits;
 

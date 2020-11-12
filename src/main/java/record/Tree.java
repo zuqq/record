@@ -7,9 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * A git tree object, i.e., a snapshot of a directory.
+ * A Git tree object, i.e., a snapshot of a directory.
  *
- * A tree consists of a list of {@link TreeNode}s that represent the directory's entries.
+ * <p>It consists of a list of {@link TreeNode}s that represent the directory's entries.
  */
 public final class Tree implements LooseObject {
     private final List<TreeNode> children;
@@ -48,9 +48,9 @@ public final class Tree implements LooseObject {
             i = j + 21;
             byte[] hash = Arrays.copyOfRange(input, j + 1, i);
             TreeNode child = switch (TreeNodeType.parse(bits)) {
-                case DIRECTORY     -> new Directory(name, hash);
-                case EXECUTABLE    -> new File(name, true, hash);
-                case FILE          -> new File(name, false, hash);
+                case DIRECTORY -> new Directory(name, hash);
+                case EXECUTABLE -> new File(name, true, hash);
+                case FILE -> new File(name, false, hash);
                 case SYMBOLIC_LINK -> new SymbolicLink(name, hash);
             };
             children.add(child);

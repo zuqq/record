@@ -1,9 +1,10 @@
 package record;
 
 /**
- * A reference points to a commit or another reference; in the latter case we
- * say that the reference is symbolic. The HEAD file is usually a symbolic
- * reference to a branch, but it can also refer to a commit ("detached HEAD").
+ * A Git reference.
+ *
+ * <p>A reference points to a commit or another reference; in the latter case we
+ * say that the reference is symbolic.
  */
 public final class Reference {
     private final String name;

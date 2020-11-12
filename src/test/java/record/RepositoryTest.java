@@ -17,7 +17,8 @@ public class RepositoryTest {
 
         new Repository(directory).init();
 
-        Assertions.assertEquals("ref: refs/heads/master\n",
+        Assertions.assertEquals(
+                "ref: refs/heads/master\n",
                 Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
     }
 
@@ -33,13 +34,16 @@ public class RepositoryTest {
             repository.init();
             Files.createDirectory(directory.resolve("src"));
             Files.writeString(directory.resolve("src/a"), "a\n", StandardCharsets.UTF_8);
-            repository.commit(new User("Jane Doe", "jane@example.com"),
-                    Timestamp.of("1604560870 +0100"), "Initial commit");
+            repository.commit(
+                    new User("Jane Doe", "jane@example.com"),
+                    Timestamp.of("1604560870 +0100"),
+                    "Initial commit");
         }
 
         @Test
         void commit() throws IOException {
-            Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
+            Assertions.assertEquals(
+                    "3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/refs/heads/master"), StandardCharsets.UTF_8));
         }
 
@@ -47,7 +51,8 @@ public class RepositoryTest {
         void branch() throws IOException {
             repository.branch("init");
 
-            Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
+            Assertions.assertEquals(
+                    "3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/refs/heads/init"), StandardCharsets.UTF_8));
         }
 
@@ -56,23 +61,27 @@ public class RepositoryTest {
             Files.createDirectory(directory.resolve("x"));
             Files.writeString(directory.resolve("x/.x"), "x\n", StandardCharsets.UTF_8);
             Files.createSymbolicLink(directory.resolve("a"), directory.resolve("src/a"));
-            repository.commit(new User("Jane Doe", "jane@example.com"),
-                    Timestamp.of("1604560898 +0100"), "Add more stuff");
+            repository.commit(
+                    new User("Jane Doe", "jane@example.com"),
+                    Timestamp.of("1604560898 +0100"),
+                    "Add more stuff");
 
             repository.checkout("3d55094ecc4dc83fccdeac612207d3f313b570ce");
 
-            Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
+            Assertions.assertEquals(
+                    "3d55094ecc4dc83fccdeac612207d3f313b570ce\n",
                     Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
-            Assertions.assertEquals("x\n",
-                    Files.readString(directory.resolve("x/.x"), StandardCharsets.UTF_8));
+            Assertions.assertEquals(
+                    "x\n", Files.readString(directory.resolve("x/.x"), StandardCharsets.UTF_8));
             Assertions.assertFalse(Files.exists(directory.resolve("a")));
 
             repository.checkout("master");
 
-            Assertions.assertEquals("ref: refs/heads/master\n",
+            Assertions.assertEquals(
+                    "ref: refs/heads/master\n",
                     Files.readString(directory.resolve(".git/HEAD"), StandardCharsets.UTF_8));
-            Assertions.assertEquals(directory.resolve("src/a"),
-                    Files.readSymbolicLink(directory.resolve("a")));
+            Assertions.assertEquals(
+                    directory.resolve("src/a"), Files.readSymbolicLink(directory.resolve("a")));
         }
     }
 }

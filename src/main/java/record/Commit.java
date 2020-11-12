@@ -4,10 +4,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * A git commit object.
+ * A Git commit object.
  *
- * Commits are textual objects; unlike trees, they use Base-16 encoded hashes of the objects
- * they refer to.
+ * <p>Commits are textual objects: unlike trees, they use Base16-encoded hashes
+ * of the objects they refer to.
  */
 public final class Commit implements LooseObject {
     private final String tree;
@@ -19,21 +19,22 @@ public final class Commit implements LooseObject {
     private final String message;
 
     /**
-     * @param tree The Base16-encoded hash of the tree.
-     * @param parents A list of the Base16-encoded hashes of the parents.
-     * @param author Who created the content.
-     * @param authorDate When the content was created.
-     * @param committer Who is creating the commit.
-     * @param committerDate When the commit was created.
-     * @param message The commit message.
+     * @param tree          The tree's Base16-encoded hash.
+     * @param parents       A list of the parents' Base16-encoded hashes.
+     * @param author        Who created the content.
+     * @param authorDate    When the content was created.
+     * @param committer     Who is creating the commit.
+     * @param committerDate When the commit is being created.
+     * @param message       The commit message.
      */
-    public Commit(String tree,
-                  List<String> parents,
-                  User author,
-                  Timestamp authorDate,
-                  User committer,
-                  Timestamp committerDate,
-                  String message) {
+    public Commit(
+            String tree,
+            List<String> parents,
+            User author,
+            Timestamp authorDate,
+            User committer,
+            Timestamp committerDate,
+            String message) {
         this.tree = tree;
         this.parents = parents;
         this.author = author;
@@ -87,10 +88,19 @@ public final class Commit implements LooseObject {
             bodyBuilder.append("parent ").append(parent).append('\n');
         }
         bodyBuilder
-                .append("author ").append(author).append(' ').append(authorDate).append('\n')
-                .append("committer ").append(committer).append(' ').append(committerDate).append('\n')
+                .append("author ")
+                .append(author)
+                .append(' ')
+                .append(authorDate)
                 .append('\n')
-                .append(message).append('\n');
+                .append("committer ")
+                .append(committer)
+                .append(' ')
+                .append(committerDate)
+                .append('\n')
+                .append('\n')
+                .append(message)
+                .append('\n');
         return bodyBuilder.toString().getBytes(StandardCharsets.UTF_8);
     }
 }
