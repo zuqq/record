@@ -3,9 +3,9 @@ package record;
 import java.nio.charset.StandardCharsets;
 
 /**
- * A node in a {@link Tree}, i.e., a named {@link LooseObject}.
+ * A node in a {@link Tree}, i.e., a named reference to a {@link LooseObject}.
  *
- * <p>It is serialized according to the following schema:
+ * <p>It is serialized by {@link #toEntry()} according to the following schema:
  * <pre><code>
  * +------+----+------+-----+------+
  * | type | SP | name | NUL | hash |

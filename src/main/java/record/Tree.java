@@ -9,7 +9,8 @@ import java.util.List;
 /**
  * A Git tree object, i.e., a snapshot of a directory.
  *
- * <p>It consists of a list of {@link TreeNode}s that represent the directory's entries.
+ * <p>It consists of a list of {@link TreeNode}s that represent the directory's
+ * entries.
  */
 public final class Tree implements LooseObject {
     private final List<TreeNode> children;
