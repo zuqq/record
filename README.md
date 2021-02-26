@@ -1,6 +1,6 @@
 # record
 
-[![Build Status](https://travis-ci.com/zuqq/record.svg?branch=master)](https://travis-ci.com/zuqq/record)
+![tests](https://github.com/zuqq/record/actions/workflows/tests.yml/badge.svg)
 
 An implementation of the Git object model. As it uses POSIX file permissions,
 it's unlikely to work on Windows.
