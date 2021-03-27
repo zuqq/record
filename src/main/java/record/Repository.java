@@ -90,7 +90,7 @@ public final class Repository {
      */
     private byte[] readObject(String encodedHash) throws IOException {
         try (InputStream file = Files.newInputStream(getObjectPath(encodedHash));
-                InflaterInputStream stream = new InflaterInputStream(file)) {
+             InflaterInputStream stream = new InflaterInputStream(file)) {
             return stream.readAllBytes();
         }
     }
@@ -119,7 +119,7 @@ public final class Repository {
         }
         if (!Files.exists(path)) {
             try (OutputStream file = Files.newOutputStream(path);
-                    DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
+                 DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
                 stream.write(object.getBytes());
             }
             Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("r--r--r--"));
@@ -266,11 +266,9 @@ public final class Repository {
 
         @Override
         public void visit(SymbolicLink node) throws IOException {
+            byte[] body = Blob.parse(readObject(node.getObjectHash())).getBody();
             Files.createSymbolicLink(
-                    currentDirectory.resolve(node.getName()),
-                    Path.of(
-                            new String(
-                                    Blob.parse(readObject(node.getObjectHash())).getBody(), StandardCharsets.UTF_8)));
+                    currentDirectory.resolve(node.getName()), Path.of(new String(body, StandardCharsets.UTF_8)));
         }
     }
 
