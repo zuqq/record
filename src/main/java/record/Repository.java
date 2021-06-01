@@ -249,14 +249,16 @@ public final class Repository {
         public void visit(Directory node) throws IOException {
             currentDirectory = currentDirectory.resolve(node.getName());
             Files.createDirectories(currentDirectory);
-            Tree.parse(readObject(node.getObjectHash())).accept(this);
+            Tree tree = Tree.parse(readObject(node.getObjectHash()));
+            tree.accept(this);
             currentDirectory = currentDirectory.getParent();
         }
 
         @Override
         public void visit(File node) throws IOException {
             Path path = currentDirectory.resolve(node.getName());
-            Files.write(path, Blob.parse(readObject(node.getObjectHash())).getBody());
+            byte[] body = Blob.parse(readObject(node.getObjectHash())).getBody();
+            Files.write(path, body);
             Files.setPosixFilePermissions(
                     path, PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
         }
@@ -325,7 +327,8 @@ public final class Repository {
         }
         Files.walkFileTree(directory, new TreeClearer());
         byte[] treeHash = Commit.extractTreeHash(readObject(encodedCommitHash));
-        thawTree(Tree.parse(readObject(treeHash)));
+        Tree tree = Tree.parse(readObject(treeHash));
+        thawTree(tree);
         writeReference(newHead);
     }
 }
