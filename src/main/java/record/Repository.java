@@ -113,11 +113,8 @@ public final class Repository {
      */
     private void writeObject(LooseObject object) throws IOException {
         Path path = getObjectPath(object.getHash());
-        Path bucket = path.getParent();
-        if (!Files.exists(bucket)) {
-            Files.createDirectory(bucket);
-        }
         if (!Files.exists(path)) {
+            Files.createDirectories(path.getParent());
             try (OutputStream file = Files.newOutputStream(path);
                  DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
                 stream.write(object.getBytes());
