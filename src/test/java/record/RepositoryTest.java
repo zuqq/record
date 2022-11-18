@@ -13,7 +13,9 @@ public class RepositoryTest {
     @Test
     void init() throws IOException {
         Path directory = Files.createTempDirectory("record");
+
         new Repository(directory).init();
+
         Assertions.assertEquals("ref: refs/heads/master\n", Files.readString(directory.resolve(".git/HEAD")));
     }
 
@@ -40,6 +42,7 @@ public class RepositoryTest {
         @Test
         void branch() throws IOException {
             repository.branch("init");
+
             Assertions.assertEquals("3d55094ecc4dc83fccdeac612207d3f313b570ce\n", Files.readString(directory.resolve(".git/refs/heads/init")));
         }
 
