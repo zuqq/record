@@ -9,23 +9,27 @@ import org.junit.jupiter.api.Test;
 public class CommitTest {
     private final User user = new User("Jane Doe", "jane@example.com");
     private final Timestamp firstTimestamp = Timestamp.of("1599568789 +0200");
-    private final Commit firstCommit = new Commit(
+    private final Commit firstCommit =
+        new Commit(
             "3683f870be446c7cc05ffaef9fa06415276e1828",
             new ArrayList<>(),
             user,
             firstTimestamp,
             user,
             firstTimestamp,
-            "Initial commit");
+            "Initial commit"
+        );
     private final Timestamp secondTimestamp = Timestamp.of("1599568810 +0200");
-    private final Commit secondCommit = new Commit(
+    private final Commit secondCommit =
+        new Commit(
             "5e1dd7430fe0d9b1678543ae1a318485d69fdd2c",
             Collections.singletonList(Base16.encode(firstCommit.getHash())),
             user,
             secondTimestamp,
             user,
             secondTimestamp,
-            "Add more stuff");
+            "Add more stuff"
+        );
 
     @Test
     void getHash() {

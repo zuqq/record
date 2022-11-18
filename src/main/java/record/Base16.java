@@ -43,8 +43,7 @@ final class Base16 {
             int x = digits.indexOf(string.charAt(2 * i));
             int y = digits.indexOf(string.charAt(2 * i + 1));
             if (x == -1 || y == -1) {
-                throw new FatalParseException(
-                        MessageFormat.format("Invalid hexadecimal byte at position {0}.", 2 * i));
+                throw new FatalParseException(MessageFormat.format("Invalid hexadecimal byte at position {0}.", 2 * i));
             }
             result[i] = (byte) ((x << 4) + y);
         }

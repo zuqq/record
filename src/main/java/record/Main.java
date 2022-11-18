@@ -39,8 +39,7 @@ public class Main {
             if (name == null || email == null) {
                 throw new RuntimeException("Need GIT_COMMITTER_NAME and GIT_COMMITTER_EMAIL set.");
             }
-            new Repository(findWorkingDirectory(directory))
-                    .commit(new User(name, email), Timestamp.now(), args[2]);
+            new Repository(findWorkingDirectory(directory)).commit(new User(name, email), Timestamp.now(), args[2]);
         } else if (args.length == 2 && args[0].equals("branch")) {
             new Repository(findWorkingDirectory(directory)).branch(args[1]);
         } else if (args.length == 2 && args[0].equals("checkout")) {

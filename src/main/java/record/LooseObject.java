@@ -39,8 +39,8 @@ public interface LooseObject {
     default byte[] getBytes() {
         byte[] body = getBody();
         byte[] header = String
-                .format("%s %d\0", getType(), body.length)
-                .getBytes(StandardCharsets.UTF_8);
+            .format("%s %d\0", getType(), body.length)
+            .getBytes(StandardCharsets.UTF_8);
         byte[] result = new byte[header.length + body.length];
         System.arraycopy(header, 0, result, 0, header.length);
         System.arraycopy(body, 0, result, header.length, body.length);

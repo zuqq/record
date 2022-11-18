@@ -7,10 +7,10 @@ import java.time.temporal.ChronoField;
 
 public final class Timestamp {
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-            .appendValue(ChronoField.INSTANT_SECONDS)
-            .appendLiteral(' ')
-            .appendOffset("+HHMM", "+0000")
-            .toFormatter();
+        .appendValue(ChronoField.INSTANT_SECONDS)
+        .appendLiteral(' ')
+        .appendOffset("+HHMM", "+0000")
+        .toFormatter();
 
     private final ZonedDateTime timestamp;
 

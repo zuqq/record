@@ -28,13 +28,14 @@ public final class Commit implements LooseObject {
      * @param message       The commit message.
      */
     public Commit(
-            String tree,
-            List<String> parents,
-            User author,
-            Timestamp authorDate,
-            User committer,
-            Timestamp committerDate,
-            String message) {
+        String tree,
+        List<String> parents,
+        User author,
+        Timestamp authorDate,
+        User committer,
+        Timestamp committerDate,
+        String message
+    ) {
         this.tree = tree;
         this.parents = parents;
         this.author = author;
@@ -82,25 +83,20 @@ public final class Commit implements LooseObject {
 
     @Override
     public byte[] getBody() {
-        StringBuilder bodyBuilder = new StringBuilder();
-        bodyBuilder.append("tree ").append(tree).append('\n');
+        StringBuilder builder = new StringBuilder().append("tree ").append(tree).append('\n');
         for (String parent : parents) {
-            bodyBuilder.append("parent ").append(parent).append('\n');
+            builder.append("parent ").append(parent).append('\n');
         }
-        bodyBuilder
-                .append("author ")
-                .append(author)
-                .append(' ')
-                .append(authorDate)
-                .append('\n')
-                .append("committer ")
-                .append(committer)
-                .append(' ')
-                .append(committerDate)
-                .append('\n')
-                .append('\n')
-                .append(message)
-                .append('\n');
-        return bodyBuilder.toString().getBytes(StandardCharsets.UTF_8);
+        builder
+            .append("author ").append(author).append(' ').append(authorDate).append('\n')
+            .append("committer ").append(committer).append(' ').append(committerDate).append('\n')
+            .append('\n');
+        if (message != null && !message.isEmpty()) {
+            builder.append(message);
+            if (message.charAt(message.length() - 1) != '\n') {
+                builder.append('\n');
+            }
+        }
+        return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

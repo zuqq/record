@@ -72,9 +72,9 @@ public final class Repository {
 
     private Path getObjectPath(String encodedHash) {
         return gitDirectory
-                .resolve(OBJECT_PREFIX)
-                .resolve(encodedHash.substring(0, 2))
-                .resolve(encodedHash.substring(2));
+            .resolve(OBJECT_PREFIX)
+            .resolve(encodedHash.substring(0, 2))
+            .resolve(encodedHash.substring(2));
     }
 
     private Path getObjectPath(byte[] hash) {
@@ -89,8 +89,7 @@ public final class Repository {
      * @param encodedHash The object's Base16-encoded hash.
      */
     private byte[] readObject(String encodedHash) throws IOException {
-        try (InputStream file = Files.newInputStream(getObjectPath(encodedHash));
-             InflaterInputStream stream = new InflaterInputStream(file)) {
+        try (InputStream file = Files.newInputStream(getObjectPath(encodedHash)); InflaterInputStream stream = new InflaterInputStream(file)) {
             return stream.readAllBytes();
         }
     }
@@ -115,8 +114,7 @@ public final class Repository {
         Path path = getObjectPath(object.getHash());
         if (!Files.exists(path)) {
             Files.createDirectories(path.getParent());
-            try (OutputStream file = Files.newOutputStream(path);
-                 DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
+            try (OutputStream file = Files.newOutputStream(path); DeflaterOutputStream stream = new DeflaterOutputStream(file)) {
                 stream.write(object.getBytes());
             }
             Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("r--r--r--"));
@@ -259,15 +257,13 @@ public final class Repository {
             Path path = currentDirectory.resolve(node.getName());
             byte[] body = Blob.parse(readObject(node.getObjectHash())).getBody();
             Files.write(path, body);
-            Files.setPosixFilePermissions(
-                    path, PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
+            Files.setPosixFilePermissions(path, PosixFilePermissions.fromString(node.isExecutable() ? "rwxr-xr-x" : "rw-r--r--"));
         }
 
         @Override
         public void visit(SymbolicLink node) throws IOException {
             byte[] body = Blob.parse(readObject(node.getObjectHash())).getBody();
-            Files.createSymbolicLink(
-                    currentDirectory.resolve(node.getName()), Path.of(new String(body, StandardCharsets.UTF_8)));
+            Files.createSymbolicLink(currentDirectory.resolve(node.getName()), Path.of(new String(body, StandardCharsets.UTF_8)));
         }
     }
 
