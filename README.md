@@ -36,7 +36,7 @@ java record.Main commit -m "Initial commit"
 
 **Help page:**
 
-```
+```console
 $ java record.Main
 Usage:	record init
 	record commit -m <message>
